@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trusted Vendor Playground</title>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/gh/kenjiefx/plunc/dist/plunc.min.js"
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <main plunc-app="App"></main>
+    <template plunc-name="App">
+      <section plunc-component="Main"></section>
+    </template>
+    <template plunc-name="Main">
+      <div class="bg-white p-8 rounded-xl shadow-md text-center">
+        <header>
+          <h1 class="text-2xl font-bold text-gray-800 mb-2">
+            Trusted Vendor Playground
+          </h1>
+          <div plunc-block="DarkModeToggler">
+            <input
+              type="checkbox"
+              plunc-model="isDarkMode"
+              plunc-change="toggleDarkMode()"
+            />
+            Dark Mode
+          </div>
+        </header>
+
+        <p class="text-gray-600 mb-4">
+          Trusted Vendor creates verified reviewers or verified buyers without
+          sending the reviewer an automatic review request or confirmation
+          email.
+        </p>
+        <p>
+          Important: Please check if the Digest Algorithm is setup in your Yotpo
+          account is HMAC or SHA256. Reviews will not be processed correctly if
+          the Digest Algorithm does not match the one configured in your Yotpo
+          account.
+        </p>
+
+        <label class="block text-gray-700 mb-2">App Key</label>
+        <input
+          type="text"
+          plunc-model="appKey"
+          plunc-change="onUpdate()"
+          placeholder="Enter something"
+          class="border border-gray-300 rounded-lg p-2 w-full"
+        />
+        <label class="block text-gray-700 mb-2">Secret Key</label>
+        <input
+          type="text"
+          plunc-model="secretKey"
+          plunc-change="onUpdate()"
+          placeholder="Enter something"
+          class="border border-gray-300 rounded-lg p-2 w-full"
+        />
+        <div>
+          <label class="block text-gray-700 mb-2">Reviewer Email</label>
+          <input
+            type="text"
+            plunc-model="reviewerEmail"
+            plunc-change="onUpdate()"
+            placeholder="Enter something"
+            class="border border-gray-300 rounded-lg p-2 w-full"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700 mb-2">Product ID</label>
+          <input
+            type="text"
+            plunc-model="productId"
+            plunc-change="onUpdate()"
+            placeholder="Enter something"
+            class="border border-gray-300 rounded-lg p-2 w-full"
+          />
+        </div>
+        <div class="flex items-center">
+          <div>
+            <label class="block text-gray-700 mb-2">Digest Algorithm</label>
+            <select
+              plunc-model="digestAlgorithm"
+              plunc-change="onUpdate()"
+              class="border border-gray-300 rounded-lg p-2 w-full"
+            >
+              <option value="HMAC">HMAC</option>
+              <option value="SHA256">SHA256</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-700 mb-2">Reviewer Type</label>
+            <select
+              plunc-model="reviewerType"
+              plunc-change="onUpdate()"
+              class="border border-gray-300 rounded-lg p-2 w-full"
+            >
+              <option value="verified_buyer">Verified Buyer</option>
+              <option value="verified_reviewer">Verified Reviewer</option>
+            </select>
+          </div>
+        </div>
+        <p class="text-gray-600 mb-4">Timestamp: {{ timestamp }}</p>
+        <section plunc-component="SignatureViewer"></section>
+        <section plunc-component="SubmissionMethod"></section>
+      </div>
+    </template>
+
+    <template plunc-name="SignatureViewer">
+      <h3>Digest Algorithm: {{ digestAlgorithm }}</h3>
+      <p plunc-if="digestAlgorithm == 'HMAC'">
+        HMAC is a keyed-hash message authentication code used for data integrity
+        and authentication.
+      </p>
+      <p plunc-if="digestAlgorithm == 'SHA256'">
+        SHA256 is a cryptographic hash function that produces a fixed-size hash
+        value from input data, ensuring data integrity.
+      </p>
+
+      <!-- Message Explanation -->
+      <h3>Signing Reviewer Data</h3>
+      <p>
+        To verify the integrity of the posted data and to ensure the creator of
+        the review is the verified vendor, requires attaching a digested hash
+        signature.
+      </p>
+      <div class="flex items-center">
+        <div class="flex items-center">
+          <span class="text-cyan-500">{{reviewerEmail}}</span>
+          <span class="text-amber-400">{{reviewerType}}</span>
+          <span
+            class="text-green-500"
+            plunc-if="reviewerType == 'verified_reviewer'"
+          >
+            {{productId}}
+          </span>
+          <span class="text-purple-500">{{timestamp}}</span>
+          <span class="text-red-500" plunc-if="digestAlgorithm == 'SHA256'">
+            {{secretKey}}
+          </span>
+        </div>
+        <div>
+          <button
+            plunc-click="copyMessage()"
+            class="bg-blue-500 text-white px-4 py-2 rounded-lg"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+      <p plunc-if="signature !== ''" class="text-gray-600 mb-4">
+        Signature: {{ signature }}
+      </p>
+      <p plunc-if="signature === ''" class="text-gray-600 mb-4">
+        Please fill in the required fields and select a digest algorithm to
+        generate a signature.
+      </p>
+    </template>
+
+    <template plunc-name="SubmissionMethod">
+      <h3>Submission Method</h3>
+      <p>Current submission method: {{method}}</p>
+      <p>Signature: {{signature}}</p>
+      <div class="flex items-center">
+        <button
+          plunc-click="handleSelectMethod('landing_page')"
+          plunc-style="getButtonStyle('landing_page')"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg"
+        >
+          Landing Page
+        </button>
+        <button
+          plunc-click="handleSelectMethod('reviews_widget')"
+          plunc-style="getButtonStyle('reviews_widget')"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg"
+        >
+          Reviews Widget
+        </button>
+        <button
+          plunc-click="handleSelectMethod('api_endpoint')"
+          plunc-style="getButtonStyle('api_endpoint')"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg"
+        >
+          API Endpoint
+        </button>
+      </div>
+
+      <section plunc-if="method == 'landing_page'">
+        <h4>Creating verified reviews via a dedicated landing page</h4>
+        <p>
+          Using this implementation method, you can create a unique URL that can
+          be added to emails or pages on your site. The URL contains a
+          calculated signature that will direct reviewers to a Yotpo-hosted
+          landing page when clicked. Reviews submitted via this Yotpo-hosted
+          landing page will receive a Verified Buyer or Verified Reviewer badge
+          based on the URL parameters.
+        </p>
+        <pre>
+            https://landing-pages.yotpo.com/base/#/review?appkey={{appKey}}&sku={{productId}}&product_title=USBthingy&product_description=testing-this-thing&product_url=http:%2F%2Fgkshops.com%2FBigUSBthingy.html&display_%20name=Arthurl&email={{reviewerEmail}}&signature={{signature}}&time_stamp={{timestamp}}&reviewer_type={{reviewerType}}&review_title_required=true
+        </pre>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Parameter</th>
+              <th scope="col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>appkey</td>
+              <td>Your Yotpo account API key</td>
+            </tr>
+            <tr>
+              <td>sku</td>
+              <td>The SKU (stock-keeping unit) of the product</td>
+            </tr>
+            <tr>
+              <td>product_title</td>
+              <td>The name of the product</td>
+            </tr>
+            <tr>
+              <td>product_description&nbsp;</td>
+              <td>The description of the product</td>
+            </tr>
+            <tr>
+              <td>product_url</td>
+              <td>The URL of the product on your store website</td>
+            </tr>
+            <tr>
+              <td>display_name</td>
+              <td>reviewer display name&nbsp;</td>
+            </tr>
+            <tr>
+              <td>email</td>
+              <td>The verified buyer or verified reviewer user email</td>
+            </tr>
+            <tr>
+              <td>signature</td>
+              <td>
+                The signature is the hexadecimal representation of a computed
+                Hash-based Message Authentication Code, using HMAC or SHA256 as
+                the cryptographic function.<br />The secret for the function is
+                the
+                <a
+                  href="/v1/docs/finding-your-yotpo-app-key-and-secret-key"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  data-a11y-ext-processed="true"
+                  >account secret<span
+                    class="sr-only"
+                    style="user-select: none"
+                  >
+                    (opens in new tab)</span
+                  ></a
+                >.<br />See
+                <a
+                  href="/v1/docs/implementing-trusted-vendors#signing-reviewer-data"
+                  translate="no"
+                  rel="noopener"
+                  >Signing Reviewer Data</a
+                >
+                to learn how to generate a data signature.
+              </td>
+            </tr>
+            <tr>
+              <td>time_stamp</td>
+              <td>Unix timestamp</td>
+            </tr>
+            <tr>
+              <td>reviewer_type</td>
+              <td>
+                The reviewer type. Use this field only if there is also a
+                Reviews Widget on the same page.<br />Possible values:<br /><strong
+                  >verified_buyer&nbsp;</strong
+                >or <strong>verified_reviewer</strong>
+              </td>
+            </tr>
+            <tr>
+              <td>review_title_required</td>
+              <td>
+                Accepts a Boolean as a parameter.<br />false: will not include a
+                review title field in the landing page<br />true: will include a
+                review title field in the landing page
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section plunc-if="method == 'reviews_widget'">
+        <h4>
+          Creating verified reviews through the Reviews Widget or Reviews Tab
+        </h4>
+        <p>
+          Using this implementation method, reviews created through the Reviews
+          Widget or the Reviews Tab will receive a Verified Buyer or Verified
+          Reviewer badge based on your configurations.
+        </p>
+        <p>
+          Add the div element below to the DOM structure of the relevant page.
+        </p>
+        <div class="bg-red-100 p-4 border border-red-400 text-red-700">
+          Please note: You'll need to substitute each data element with the
+          appropriate values of the buyer or reviewer. The div class must be
+          "yotpo-signed-data" The element should be added to the DOM structure
+          of the relevant page.
+        </div>
+        <code>
+          &lt;div class="yotpo-signed-data" data-user-name="my name"
+          data-user-email="{{reviewerEmail}}" data-signature="{{signature}}"
+          data-reviewer-type="{{reviewerType}}" data-time-stamp="{{timestamp}}"
+          &gt;&lt;/div&gt;
+        </code>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Parameter</th>
+              <th scope="col">Description&nbsp;</th>
+              <th scope="col">Required&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>data-user-name</td>
+              <td>The full name of the verified buyer/verified reviewer</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>data-user-email</td>
+              <td>The email address of the verified buyer/verified reviewer</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>data-reviewer-type</td>
+              <td>
+                The reviewer type.<br />Use this field only if there is also a
+                reviews widget on the same page.<br />Possible values:<br /><strong
+                  >verified_buyer</strong
+                >
+                or <strong>verified_reviewer</strong>
+              </td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>data-time-stamp</td>
+              <td>Unix timestamp</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>data-signature</td>
+              <td>
+                The signature is the hexadecimal representation of a computed
+                hash-based Message Authentication Code, using HMAC or SHA256 as
+                the cryptographic function.<br />The secret for the function is
+                the
+                <a
+                  href="/v1/docs/finding-your-yotpo-app-key-and-secret-key"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  data-a11y-ext-processed="true"
+                  >account secret<span
+                    class="sr-only"
+                    style="user-select: none"
+                  >
+                    (opens in new tab)</span
+                  ></a
+                >.<br />See
+                <a
+                  href="/v1/docs/implementing-trusted-vendors#signing-reviewer-data"
+                  rel="noopener"
+                  >Signing Reviewer Data</a
+                >
+                to learn how to generate a data signature.
+              </td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>data-reviewer-badge</td>
+              <td>
+                The custom badge name for this reviewer.<br />Note: &nbsp;Only
+                use this when using the Customized Badge feature
+              </td>
+              <td><br /></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section plunc-if="method == 'api_endpoint'">
+        <h4>Creating verified reviews by API endpoint</h4>
+        <p>
+          Using this implementation method, reviews created using the Create
+          Reviews (Asynchronous) endpoint will receive a Verified Buyer or
+          Verified Reviewer badge based on your configurations.
+        </p>
+        <p>
+          Please refer to the
+          <a href="https://apidocs.yotpo.com/reference/welcome#creating-reviews"
+            >Creating Reviews (Asynchronous) endpoint</a
+          >
+          in the Yotpo API documentation to view a full list of endpoint
+          parameters, values, and responses.
+        </p>
+        <pre>
+            curl --location 'https://api.yotpo.com/v1/widget/reviews' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "appkey": "{{appkey}}",
+    "domain": "http://www.shop.com",
+    "sku": "10",
+    "product_title": "Phone",
+    "product_description": "Smart Phone",
+    "product_url": "http://www.shop.com/phone.html",
+    "product_image_url": "http://www.shop.com/phone.jpg",
+    "display_name": "John Smith",
+    "email": "{{reviewerEmail}}",
+    "review_content": "It’s really good",
+    "review_title": "Great Phone",
+    "review_score": 5,
+    "signature": "{{signature}}",
+    "time_stamp": "{{timeStamp}}",
+    "reviewer_type": "{{reviewerType}}"
+}'
+        </pre>
+
+        <div class="bg-red-100 p-4 border border-red-400 text-red-700">
+          Please note: When creating Trusted Vendors reviews using this method,
+          the following parameters must be included:
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Parameter</th>
+              <th scope="col">Description</th>
+              <th scope="col">Required for Trusted Vendors</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>appkey</td>
+              <td>Your Yotpo account API key.</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>domain</td>
+              <td>The account domain.</td>
+              <td><br /></td>
+            </tr>
+            <tr>
+              <td>sku</td>
+              <td>
+                The unique ID of the product on your site (doesn't have to be
+                the SKU). To create a site review, use the value:
+                'yotpo_site_reviews'
+              </td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>product_title&nbsp;</td>
+              <td>The title of the product.</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>product_description</td>
+              <td>The description of the product</td>
+              <td><br /></td>
+            </tr>
+            <tr>
+              <td>product_url</td>
+              <td>The product page URL of the product</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>product_image_url</td>
+              <td>The URL of the product image</td>
+              <td><br /></td>
+            </tr>
+            <tr>
+              <td>display_name</td>
+              <td>The reviewer's name</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>email</td>
+              <td>The reviewer's email address</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>review_content&nbsp;</td>
+              <td>The text content of the review</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>image_urls</td>
+              <td>
+                The images submitted with the review.<br />Please note: Videos
+                cannot be uploaded via API.
+              </td>
+              <td><br /></td>
+            </tr>
+            <tr>
+              <td>review_title</td>
+              <td>The title of the review</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>review_score</td>
+              <td>The review score</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>signature</td>
+              <td>
+                The signature is the hexadecimal representation of a computed
+                Hash-based Message Authentication Code, using SHA256 as the
+                cryptographic function (HMAC-SHA256). Must be passed in
+                lowercase characters.<br />The secret for the function is the
+                <a
+                  href="/v1/docs/finding-your-yotpo-app-key-and-secret-key"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  data-a11y-ext-processed="true"
+                  >account secret<span
+                    class="sr-only"
+                    style="user-select: none"
+                  >
+                    (opens in new tab)</span
+                  ></a
+                >
+                key.<br />Note: The 'time_stamp' and 'reviewer_type' parameters
+                are mandatory when using the signature parameter.<br />See
+                <a
+                  href="/v1/docs/implementing-trusted-vendors#signing-reviewer-data"
+                  rel="noopener"
+                  >Signing Reviewer Data</a
+                >
+                to learn how to generate a data signature.
+              </td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>time_stamp</td>
+              <td>Unix timestamp</td>
+              <td>√</td>
+            </tr>
+            <tr>
+              <td>submission_time_stamp</td>
+              <td>
+                The date the review was created (if not today). Can be up to 7
+                days in the past. If you want to add a creation date that is
+                more than 7 days in the past, please
+                <a
+                  href="https://reviews.yotpo.com/#/?modal=contact_support"
+                  target="_blank"
+                  rel="noopener"
+                  data-a11y-ext-processed="true"
+                  >contact support<span
+                    class="sr-only"
+                    style="user-select: none"
+                  >
+                    (opens in new tab)</span
+                  ></a
+                >
+              </td>
+              <td><br /></td>
+            </tr>
+            <tr>
+              <td>reviewer_type</td>
+              <td>
+                The reviewer badge type.<br />Possible values:<br /><strong
+                  >verified_buyer</strong
+                >
+                or <strong>verified_reviewer</strong><br />Note: This is
+                relevant when creating reviews as a Trusted Vendor (signature is
+                mandatory)
+              </td>
+              <td>√</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </template>
+  </body>
+</html>
