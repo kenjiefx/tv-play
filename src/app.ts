@@ -10,6 +10,8 @@ import {
   SubmissionMethod,
   SubmissionMethodType,
   AppAPI,
+  ToastNotification,
+  BlockAPI,
 } from "./types";
 
 (function () {
@@ -83,6 +85,7 @@ import {
       SignatureService: SignatureService,
       SignatureViewer: SignatureViewer,
       SubmissionMethod: SubmissionMethod,
+      ToastNotification: ToastNotification,
       $patch: PatchAPI,
       $app: AppAPI,
     ) => {
@@ -94,6 +97,12 @@ import {
       $scope.reviewerEmail = "";
       $scope.productId = "";
       $scope.signature = "";
+      $scope.secretKeyInputType = "password";
+      $scope.toggleSecretKeyInputType = () => {
+        $scope.secretKeyInputType =
+          $scope.secretKeyInputType === "password" ? "text" : "password";
+        $patch("SecretKeyInputField");
+      };
       $app.ready(async () => {
         $scope.isDarkMode = localStorage.getItem("isDarkMode") === "true";
         await $patch("DarkModeToggler");
@@ -104,6 +113,30 @@ import {
         $scope.isDarkMode = isDarkMode;
         document.body.classList.toggle("dark-mode", isDarkMode);
         await $patch("DarkModeToggler");
+      };
+      $scope.fillDemoData = async () => {
+        $scope.appKey = "demoAppKey";
+        $scope.secretKey = "demoSecretKey";
+        $scope.reviewerEmail = "demo@example.com";
+        $scope.productId = "demoProductId";
+        $scope.reviewerType = "verified_buyer";
+        $scope.digestAlgorithm = "HMAC";
+        $scope.timestamp = Date.now();
+        $scope.signature = await SignatureService.generateHMAC(
+          {
+            reviewerEmail: $scope.reviewerEmail,
+            reviewerType: $scope.reviewerType,
+            productId: $scope.productId,
+            timestamp: $scope.timestamp,
+          },
+          $scope.secretKey,
+        );
+        await $patch();
+        SignatureViewer.setSignature($scope.signature, $scope);
+        SubmissionMethod.setParams($scope);
+        ToastNotification.showToast(
+          "Demo data populated and signature generated!",
+        );
       };
       $scope.onUpdate = () => {
         const {
@@ -159,21 +192,38 @@ import {
     },
   );
 
-  app.component(
+  app.component<SignatureViewer>(
     "SignatureViewer",
-    ($scope: SignatureViewerScope, $patch: PatchAPI) => {
+    (
+      $scope: SignatureViewerScope,
+      $patch: PatchAPI,
+      $block: BlockAPI,
+      ToastNotification: ToastNotification,
+    ) => {
       $scope.signature = "";
       $scope.copyMessage = () => {
-        const secretKeySection =
-          $scope.digestAlgorithm === "SHA256" ? $scope.secretKey : "";
-        const message =
-          $scope.reviewerType === "verified_buyer"
-            ? `${$scope.reviewerEmail}${$scope.reviewerType}${$scope.productId}${$scope.timestamp}${secretKeySection}`
-            : `${$scope.reviewerEmail}${$scope.reviewerType}${$scope.timestamp}${secretKeySection}`;
-        navigator.clipboard.writeText(message);
+        $block("PlainConcatenatedString", (block) => {
+          console.log("Accessing PlainConcatenatedString block:", block);
+          if (null === block) return;
+          if (!(block.$element instanceof HTMLElement)) return;
+          navigator.clipboard.writeText(block.$element.innerText);
+          ToastNotification.showToast("Message copied to clipboard!");
+        });
+      };
+      $scope.copySignature = () => {
+        $block("SignatureText", (block) => {
+          console.log("Accessing SignatureText block:", block);
+          if (null === block) return;
+          if (!(block.$element instanceof HTMLElement)) return;
+          navigator.clipboard.writeText(block.$element.innerText);
+          ToastNotification.showToast("Signature copied to clipboard!");
+        });
       };
       return {
-        setSignature: (signature: string, params: TrustedVendorsParams) => {
+        setSignature: async (
+          signature: string,
+          params: TrustedVendorsParams,
+        ) => {
           $scope.signature = signature;
           $scope.appKey = params.appKey;
           $scope.secretKey = params.secretKey;
@@ -182,7 +232,7 @@ import {
           $scope.reviewerType = params.reviewerType;
           $scope.digestAlgorithm = params.digestAlgorithm;
           $scope.timestamp = params.timestamp;
-          $patch();
+          await $patch();
         },
       };
     },
@@ -190,7 +240,13 @@ import {
 
   app.component<SubmissionMethod>(
     "SubmissionMethod",
-    ($scope: SubmissionMethodScope, $patch: PatchAPI, $app: AppAPI) => {
+    (
+      $scope: SubmissionMethodScope,
+      $patch: PatchAPI,
+      $block: BlockAPI,
+      $app: AppAPI,
+      ToastNotification: ToastNotification,
+    ) => {
       $scope.method = "landing_page"; // default value for submission method
       $scope.signature = "";
       $scope.appKey = "";
@@ -212,8 +268,55 @@ import {
           ? "bg-blue-700 text-white px-4 py-2 rounded-lg"
           : "bg-blue-500 text-white px-4 py-2 rounded-lg";
       };
+      function copyAndToast(p: { textToCopy: string; successMessage: string }) {
+        navigator.clipboard.writeText(p.textToCopy).then(
+          () => {
+            ToastNotification.showToast(p.successMessage);
+          },
+          (err) => {
+            console.error("Failed to copy text:", err);
+          },
+        );
+      }
+      $scope.copyLandingPageUrl = () => {
+        $block("LandingPageUrlText", (block) => {
+          if (null === block) return;
+          if (!(block.$element instanceof HTMLElement)) return;
+          const landingPageUrl = block.$element.innerText;
+          copyAndToast({
+            textToCopy: landingPageUrl,
+            successMessage: "Landing page URL copied to clipboard.",
+          });
+        });
+      };
+
+      $scope.copyDOMElementText = () => {
+        $block("HTMLDOMElementText", (block) => {
+          if (null === block) return;
+          const text = block.$element.getHTML();
+          // Convert HTML entities to their corresponding characters
+          const textarea = document.createElement("textarea");
+          textarea.innerHTML = text;
+          const decodedText = textarea.value;
+          copyAndToast({
+            textToCopy: decodedText,
+            successMessage: "HTML copied to clipboard.",
+          });
+        });
+      };
+
+      $scope.copyCurlCommandText = () => {
+        $block("CurlCommandText", (block) => {
+          if (null === block) return;
+          const curlCommandText = block.$element.getHTML();
+          copyAndToast({
+            textToCopy: curlCommandText,
+            successMessage: "cURL command copied to clipboard.",
+          });
+        });
+      };
       return {
-        setParams: (params: TrustedVendorsParams) => {
+        setParams: async (params: TrustedVendorsParams) => {
           $scope.appKey = params.appKey;
           $scope.secretKey = params.secretKey;
           $scope.reviewerEmail = params.reviewerEmail;
@@ -222,9 +325,31 @@ import {
           $scope.digestAlgorithm = params.digestAlgorithm;
           $scope.timestamp = params.timestamp;
           $scope.signature = params.signature;
-          $patch();
+          await $patch();
         },
       };
     },
   );
+
+  app.component<ToastNotification>("ToastNotification", ($block: BlockAPI) => {
+    return {
+      showToast: (message: string) => {
+        $block("ToastNotificationContainer", (block) => {
+          if (null === block) return;
+          const messageElement = block.$element.querySelector(
+            "[data-toast-message] ",
+          );
+          if (messageElement) {
+            messageElement.textContent = message;
+            block.$element.classList.remove("translate-y-12", "opacity-0");
+            block.$element.classList.add("translate-y-0", "opacity-100");
+            setTimeout(() => {
+              block.$element.classList.remove("translate-y-0", "opacity-100");
+              block.$element.classList.add("translate-y-12", "opacity-0");
+            }, 2400);
+          }
+        });
+      },
+    };
+  });
 })();

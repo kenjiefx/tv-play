@@ -11,16 +11,27 @@ export type TrustedVendorsParams = {
 
 export type MainScope = TrustedVendorsParams & {
   isDarkMode: boolean;
+  secretKeyInputType: "password" | "text";
+  toggleSecretKeyInputType: () => void;
   toggleDarkMode: () => void;
   onUpdate: () => void;
+  fillDemoData: () => Promise<void>;
 };
 
 export type SignatureViewerScope = TrustedVendorsParams & {
   copyMessage: () => void;
+  copySignature: () => void;
 };
 
 export type SignatureViewer = {
-  setSignature: (signature: string, params: TrustedVendorsParams) => void;
+  setSignature: (
+    signature: string,
+    params: TrustedVendorsParams,
+  ) => Promise<void>;
+};
+
+export type ToastNotification = {
+  showToast: (message: string) => void;
 };
 
 export type SubmissionMethodType =
@@ -31,10 +42,13 @@ export type SubmissionMethodScope = TrustedVendorsParams & {
   method: SubmissionMethodType;
   handleSelectMethod: (method: SubmissionMethodType) => void;
   getButtonStyle: (method: SubmissionMethodType) => string;
+  copyLandingPageUrl: () => void;
+  copyDOMElementText: () => void;
+  copyCurlCommandText: () => void;
 };
 
 export type SubmissionMethod = {
-  setParams: (params: TrustedVendorsParams) => void;
+  setParams: (params: TrustedVendorsParams) => Promise<void>;
 };
 
 export type SignatureService = {

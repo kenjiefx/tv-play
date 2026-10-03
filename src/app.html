@@ -421,7 +421,7 @@
               <!-- Preset Demo Button -->
               <button
                 type="button"
-                onclick="fillDemoData()"
+                plunc-click="fillDemoData()"
                 title="Fill sample credentials to immediately test"
                 class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 dark-mode:bg-slate-800 dark-mode:text-slate-400 dark-mode:hover:bg-slate-700 transition-colors border border-slate-200 dark-mode:border-slate-700"
               >
@@ -576,7 +576,7 @@
                     </div>
                   </div>
 
-                  <div>
+                  <div plunc-block="SecretKeyInputField">
                     <div class="flex items-center justify-between mb-1.5">
                       <label
                         class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-400"
@@ -585,10 +585,19 @@
                       </label>
                       <button
                         type="button"
-                        onclick="toggleSecretVisibility()"
+                        plunc-click="toggleSecretKeyInputType()"
                         class="text-xs text-indigo-600 hover:text-indigo-500 dark-mode:text-indigo-400 font-medium"
                       >
-                        <span id="secret-visibility-text">Show Secret</span>
+                        <span
+                          id="secret-visibility-text"
+                          plunc-if="secretKeyInputType == 'password'"
+                          >Show Secret</span
+                        >
+                        <span
+                          id="secret-visibility-text"
+                          plunc-if="secretKeyInputType == 'text'"
+                          >Hide Secret</span
+                        >
                       </button>
                     </div>
                     <div class="relative">
@@ -610,7 +619,7 @@
                         </svg>
                       </div>
                       <input
-                        type="password"
+                        type="{{secretKeyInputType}}"
                         id="secretKeyInput"
                         plunc-model="secretKey"
                         plunc-change="onUpdate()"
@@ -838,6 +847,7 @@
           </footer>
         </div>
       </div>
+      <div plunc-component="ToastNotification"></div>
     </template>
 
     <!-- SignatureViewer Component Template -->
@@ -886,6 +896,7 @@
                   </div>
                   <div
                     id="signatureText"
+                    plunc-block="SignatureText"
                     class="font-mono text-sm sm:text-base font-bold text-emerald-600 dark-mode:text-emerald-400 break-all select-all leading-relaxed"
                   >
                     {{ signature }}
@@ -893,7 +904,7 @@
                 </div>
                 <button
                   type="button"
-                  onclick="copySignatureValue(this)"
+                  plunc-click="copySignature()"
                   title="Copy Signature"
                   class="shrink-0 p-2 rounded-lg bg-white dark-mode:bg-slate-800 border border-slate-200 dark-mode:border-slate-700 text-slate-600 dark-mode:text-slate-300 hover:text-indigo-600 dark-mode:hover:text-indigo-400 transition-colors shadow-sm"
                 >
@@ -936,7 +947,7 @@
 
           <!-- When signature is pending -->
           <div
-            plunc-if="signature === ''"
+            plunc-if="signature == ''"
             class="mt-4 p-6 tv-well text-center space-y-2"
           >
             <div
@@ -991,7 +1002,6 @@
             <button
               type="button"
               plunc-click="copyMessage()"
-              onclick="showToast('Raw signing payload copied to clipboard!')"
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors shadow-sm shrink-0"
             >
               <svg
@@ -1028,6 +1038,7 @@
 
             <!-- Plain Continuous Color-Coded String (No Blocks, No Plus Signs) -->
             <div
+              plunc-block="PlainConcatenatedString"
               class="p-3.5 rounded-lg bg-slate-900 border border-slate-700/80 shadow-inner font-mono text-sm sm:text-base break-all select-all leading-relaxed tracking-wide"
             >
               <span class="text-cyan-400 font-semibold">{{reviewerEmail}}</span
@@ -1227,6 +1238,7 @@
           </div>
         </div>
       </div>
+      <div plunc-component="ToastNotification"></div>
     </template>
 
     <!-- SubmissionMethod Component Template -->
@@ -1370,7 +1382,7 @@
               </div>
               <button
                 type="button"
-                onclick="copyElementText('landingPageUrl', this)"
+                plunc-click="copyLandingPageUrl()"
                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
               >
                 <svg
@@ -1391,7 +1403,8 @@
             </div>
             <pre
               class="p-4 text-xs sm:text-sm font-mono text-emerald-400 break-all whitespace-pre-wrap leading-relaxed overflow-x-auto"
-            ><code id="landingPageUrl">https://landing-pages.yotpo.com/base/#/review?appkey={{appKey}}&sku={{productId}}&product_title=USBthingy&product_url=http:%2F%2Fgkshops.com%2FBigUSBthingy.html&display_name=Arthur&email={{reviewerEmail}}&signature={{signature}}&time_stamp={{timestamp}}&reviewer_type={{reviewerType}}&review_title_required=true</code></pre>
+            ><code plunc-block="LandingPageUrlText">https://landing-pages.yotpo.com/base/#/review?appkey={{appKey}}&sku={{productId}}&product_title=USBthingy&product_url=http:%2F%2Fgkshops.com%2FBigUSBthingy.html&display_name=Arthur&email={{reviewerEmail}}&signature={{signature}}&time_stamp={{timestamp}}&reviewer_type={{reviewerType}}&review_title_required=true</code>
+            </pre>
           </div>
 
           <!-- Parameter Reference Table -->
@@ -1594,7 +1607,7 @@
               </div>
               <button
                 type="button"
-                onclick="copyElementText('widgetSnippet', this)"
+                plunc-click="copyDOMElementText()"
                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
               >
                 <svg
@@ -1615,12 +1628,13 @@
             </div>
             <pre
               class="p-4 text-xs sm:text-sm font-mono text-sky-300 break-all whitespace-pre-wrap leading-relaxed overflow-x-auto"
-            ><code id="widgetSnippet">&lt;div class="yotpo-signed-data"
+            ><code plunc-block="HTMLDOMElementText">&lt;div class="yotpo-signed-data"
      data-user-name="John Doe"
      data-user-email="{{reviewerEmail}}"
      data-signature="{{signature}}"
      data-reviewer-type="{{reviewerType}}"
-     data-time-stamp="{{timestamp}}"&gt;&lt;/div&gt;</code></pre>
+     data-time-stamp="{{timestamp}}"
+&gt;&lt;/div&gt;</code></pre>
           </div>
 
           <!-- Parameter Reference Table -->
@@ -1781,7 +1795,7 @@
               </div>
               <button
                 type="button"
-                onclick="copyElementText('curlSnippet', this)"
+                plunc-click="copyCurlCommandText()"
                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
               >
                 <svg
@@ -1802,7 +1816,7 @@
             </div>
             <pre
               class="p-4 text-xs sm:text-sm font-mono text-slate-200 whitespace-pre-wrap leading-relaxed overflow-x-auto"
-            ><code id="curlSnippet">curl --location 'https://api.yotpo.com/v1/widget/reviews' \
+            ><code plunc-block="CurlCommandText">curl --location 'https://api.yotpo.com/v1/widget/reviews' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "appkey": "{{appKey}}",
@@ -2113,106 +2127,30 @@
           </div>
         </section>
       </div>
+      <div plunc-component="ToastNotification"></div>
     </template>
 
-    <!-- Global Toast Notification Container -->
-    <div
-      id="toastNotification"
-      class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 text-white dark-mode:bg-white dark-mode:text-slate-900 shadow-2xl text-xs font-semibold transition-all duration-300 transform translate-y-12 opacity-0 pointer-events-none"
-    >
-      <svg
-        class="w-4 h-4 text-emerald-400 dark-mode:text-emerald-600 shrink-0"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
+    <!-- Toast Notification Component -->
+    <template plunc-name="ToastNotification">
+      <div
+        plunc-block="ToastNotificationContainer"
+        class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 text-white dark-mode:bg-white dark-mode:text-slate-900 shadow-2xl text-xs font-semibold transition-all duration-300 transform translate-y-12 opacity-0 pointer-events-none"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 13l4 4L19 7"
-        />
-      </svg>
-      <span id="toastMessage">Copied!</span>
-    </div>
-
-    <!-- UI Helper Scripts -->
-    <script>
-      // Secret Key Visibility Toggle
-      function toggleSecretVisibility() {
-        const input = document.getElementById("secretKeyInput");
-        const text = document.getElementById("secret-visibility-text");
-        if (!input) return;
-        if (input.type === "password") {
-          input.type = "text";
-          if (text) text.textContent = "Hide Secret";
-        } else {
-          input.type = "password";
-          if (text) text.textContent = "Show Secret";
-        }
-      }
-
-      // Copy signature value
-      function copySignatureValue(btn) {
-        const el = document.getElementById("signatureText");
-        if (el && el.textContent.trim()) {
-          navigator.clipboard.writeText(el.textContent.trim()).then(() => {
-            showToast("Signature copied to clipboard!");
-          });
-        }
-      }
-
-      // Copy element text content
-      function copyElementText(id, btn) {
-        const el = document.getElementById(id);
-        if (el) {
-          const text = el.innerText || el.textContent;
-          navigator.clipboard.writeText(text.trim()).then(() => {
-            showToast("Copied to clipboard!");
-            if (btn) {
-              const orig = btn.innerHTML;
-              btn.innerHTML = `<span class="text-emerald-400">Copied!</span>`;
-              setTimeout(() => {
-                btn.innerHTML = orig;
-              }, 1800);
-            }
-          });
-        }
-      }
-
-      // Toast notification helper
-      function showToast(msg) {
-        const toast = document.getElementById("toastNotification");
-        const text = document.getElementById("toastMessage");
-        if (!toast || !text) return;
-        text.textContent = msg;
-        toast.classList.remove("translate-y-12", "opacity-0");
-        toast.classList.add("translate-y-0", "opacity-100");
-        setTimeout(() => {
-          toast.classList.remove("translate-y-0", "opacity-100");
-          toast.classList.add("translate-y-12", "opacity-0");
-        }, 2400);
-      }
-
-      // Demo Data Filler for Immediate Testing
-      function fillDemoData() {
-        const demoValues = {
-          appKey: "yotpo_app_demo_772184",
-          secretKey: "sec_key_xyz9814523a1",
-          reviewerEmail: "elena.rostova@example.com",
-          productId: "PROD-SKU-8820",
-        };
-
-        for (const [key, value] of Object.entries(demoValues)) {
-          const input = document.querySelector(`[plunc-model="${key}"]`);
-          if (input) {
-            input.value = value;
-            input.dispatchEvent(new Event("input", { bubbles: true }));
-            input.dispatchEvent(new Event("change", { bubbles: true }));
-          }
-        }
-        showToast("Demo data populated and signature generated!");
-      }
-    </script>
+        <svg
+          class="w-4 h-4 text-emerald-400 dark-mode:text-emerald-600 shrink-0"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+        <span data-toast-message></span>
+      </div>
+    </template>
   </body>
 </html>
