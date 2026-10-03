@@ -1,0 +1,25 @@
+{
+  "name": "tv-play",
+  "version": "1.0.0",
+  "description": "Playground for Yotpo's Trusted Vendor feature",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "tsc && node ./bin/deploy.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kenjiefx/tv-play.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kenjiefx/tv-play/issues"
+  },
+  "homepage": "https://github.com/kenjiefx/tv-play#readme",
+  "devDependencies": {
+    "express": "^5.2.1",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "strictNullChecks": true,
+        "noImplicitReturns": true,
+        "skipLibCheck": true,
+        "outDir": "./src",
+        "rootDir":"./src"
+    },
+    "exclude": ["node_modules"],
+    "include": ["./src/**/*.ts"]
+}
