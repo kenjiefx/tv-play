@@ -23,7 +23,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
-        darkMode: ["class", ".dark-mode"],
         theme: {
           extend: {
             fontFamily: {
@@ -293,6 +292,67 @@
       body.dark-mode ::-webkit-scrollbar-thumb {
         background: #334155;
       }
+
+      /** Dark Mode **/
+      body.dark-mode {
+        .dark-mode\:text-white {
+          color: #ffffff !important;
+        }
+        .dark-mode\:text-slate-400 {
+          color: #cbd5e1 !important;
+        }
+        .dark-mode\:bg-slate-800\/70 {
+          background-color: rgba(30, 41, 59, 0.7) !important;
+        }
+        .dark-mode\:bg-slate-800 {
+          background-color: #1e293b !important;
+        }
+        .dark-mode\:border-slate-700 {
+          border-color: #374151 !important;
+        }
+        .dark-mode\:bg-blue-950\/40 {
+          background-color: rgba(13, 42, 68, 0.4) !important;
+        }
+        .dark-mode\:border-blue-900\/60 {
+          border-color: rgba(2, 36, 71, 0.6) !important;
+        }
+        .dark-mode\:text-blue-200 {
+          color: #60a5fa !important;
+        }
+        .dark-mode\:border-slate-700\/80 {
+          border-color: rgba(55, 65, 81, 0.8) !important;
+        }
+        .dark-mode\:text-slate-200 {
+          color: #e2e8f0 !important;
+        }
+        .dark-mode\:bg-purple-950\/40 {
+          background-color: rgba(38, 0, 77, 0.4) !important;
+        }
+        .dark-mode\:text-purple-200 {
+          color: #c4b5fd !important;
+        }
+        .dark-mode\:border-purple-900\/60 {
+          border-color: rgba(38, 0, 77, 0.6) !important;
+        }
+        .dark-mode\:text-slate-300 {
+          color: #7d93ad !important;
+        }
+        .dark-mode\:bg-slate-900\/80 {
+          background-color: rgba(15, 23, 42, 0.8) !important;
+        }
+        .dark-mode\:bg-amber-950\/40 {
+          background-color: rgba(64, 0, 0, 0.4) !important;
+        }
+        .dark-mode\:border-amber-900\/60 {
+          border-color: rgba(64, 0, 0, 0.6) !important;
+        }
+        .dark-mode\:text-amber-400 {
+          color: #fbbf24 !important;
+        }
+        .dark-mode\:text-amber-200 {
+          color: #fcd34d !important;
+        }
+      }
     </style>
 
     <script type="module" src="./app.js"></script>
@@ -359,7 +419,7 @@
                 type="button"
                 onclick="fillDemoData()"
                 title="Fill sample credentials to immediately test"
-                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 dark-mode:bg-slate-800 dark-mode:text-slate-300 dark-mode:hover:bg-slate-700 transition-colors border border-slate-200 dark-mode:border-slate-700"
+                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 dark-mode:bg-slate-800 dark-mode:text-slate-400 dark-mode:hover:bg-slate-700 transition-colors border border-slate-200 dark-mode:border-slate-700"
               >
                 <svg
                   class="w-3.5 h-3.5 text-indigo-500"
@@ -412,91 +472,13 @@
             </div>
           </header>
 
-          <!-- Documentation & Overview Callout -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div
-              class="md:col-span-2 tv-card p-6 border-l-4 border-l-indigo-600 flex items-start gap-4"
-            >
-              <div
-                class="p-2.5 rounded-lg bg-indigo-50 dark-mode:bg-indigo-950/60 text-indigo-600 dark-mode:text-indigo-400 shrink-0"
-              >
-                <svg
-                  class="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h2
-                  class="text-sm font-bold uppercase tracking-wider text-slate-900 dark-mode:text-white"
-                >
-                  About Trusted Vendor
-                </h2>
-                <p
-                  class="text-sm text-slate-600 dark-mode:text-slate-300 mt-1 leading-relaxed"
-                >
-                  Trusted Vendor enables merchants to programmatically create
-                  verified buyers or verified reviewers without sending the
-                  reviewer an automatic review request or confirmation email.
-                  Reviews are cryptographically verified using a generated
-                  signature attached to each submission.
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="tv-card p-6 border-l-4 border-l-amber-500 flex items-start gap-4"
-            >
-              <div
-                class="p-2.5 rounded-lg bg-amber-50 dark-mode:bg-amber-950/60 text-amber-600 dark-mode:text-amber-400 shrink-0"
-              >
-                <svg
-                  class="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h2
-                  class="text-sm font-bold uppercase tracking-wider text-slate-900 dark-mode:text-white"
-                >
-                  Digest Algorithm Note
-                </h2>
-                <p
-                  class="text-xs text-slate-600 dark-mode:text-slate-300 mt-1 leading-relaxed"
-                >
-                  Ensure the Digest Algorithm selected matches your Yotpo
-                  account settings (<strong>HMAC</strong> or
-                  <strong>SHA256</strong>). Submissions will fail verification
-                  if the algorithm does not match.
-                </p>
-              </div>
-            </div>
-          </div>
-
           <!-- Main Interactive Playground: 2-Column Responsive Layout -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <!-- Left Column: Form & Configuration (5 cols) -->
             <div class="lg:col-span-5 space-y-6">
               <div class="tv-card p-6 space-y-6">
                 <div
-                  class="flex items-center justify-between pb-4 border-b border-slate-200 dark-mode:border-slate-800"
+                  class="flex items-center justify-between pb-4 border-b border-slate-200 dark-mode:border-slate-700"
                 >
                   <div class="flex items-center gap-2.5">
                     <svg
@@ -516,16 +498,13 @@
                       Parameters & Credentials
                     </h3>
                   </div>
-                  <span class="text-xs text-slate-400 font-mono"
-                    >Live Inputs</span
-                  >
                 </div>
 
                 <!-- Input Group: Account Credentials -->
                 <div class="space-y-4">
                   <div>
                     <label
-                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-400 mb-2"
                     >
                       Yotpo App Key <span class="text-rose-500">*</span>
                     </label>
@@ -534,7 +513,7 @@
                         class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"
                       >
                         <svg
-                          class="w-4 h-4"
+                          class="w-5 h-5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -551,7 +530,7 @@
                         type="text"
                         plunc-model="appKey"
                         plunc-change="onUpdate()"
-                        placeholder="e.g. k5J4L3M2N1..."
+                        placeholder="4WbfkD5arSq1IIQLEwVzMLn7hnXNKCVSPNCpxgcy"
                         class="tv-input w-full pl-9 pr-3 py-2.5 text-sm font-mono"
                       />
                     </div>
@@ -560,9 +539,9 @@
                   <div>
                     <div class="flex items-center justify-between mb-1.5">
                       <label
-                        class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 uppercase tracking-wider"
+                        class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-400"
                       >
-                        Account Secret Key <span class="text-rose-500">*</span>
+                        Secret Key <span class="text-rose-500">*</span>
                       </label>
                       <button
                         type="button"
@@ -577,7 +556,7 @@
                         class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"
                       >
                         <svg
-                          class="w-4 h-4"
+                          class="w-5 h-5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -595,7 +574,7 @@
                         id="secretKeyInput"
                         plunc-model="secretKey"
                         plunc-change="onUpdate()"
-                        placeholder="e.g. secret_987654321..."
+                        placeholder="*********************"
                         class="tv-input w-full pl-9 pr-3 py-2.5 text-sm font-mono"
                       />
                     </div>
@@ -604,11 +583,11 @@
 
                 <!-- Input Group: Reviewer & Product Details -->
                 <div
-                  class="space-y-4 pt-2 border-t border-slate-100 dark-mode:border-slate-800"
+                  class="space-y-4 pt-4 border-t border-slate-100 dark-mode:border-slate-700"
                 >
                   <div>
                     <label
-                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-400 mb-2"
                     >
                       Reviewer Email <span class="text-rose-500">*</span>
                     </label>
@@ -617,7 +596,7 @@
                         class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"
                       >
                         <svg
-                          class="w-4 h-4"
+                          class="w-5 h-5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -634,7 +613,7 @@
                         type="email"
                         plunc-model="reviewerEmail"
                         plunc-change="onUpdate()"
-                        placeholder="e.g. customer@example.com"
+                        placeholder="johndoe@example.com"
                         class="tv-input w-full pl-9 pr-3 py-2.5 text-sm"
                       />
                     </div>
@@ -642,16 +621,16 @@
 
                   <div>
                     <label
-                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-400 mb-2"
                     >
-                      Product ID (SKU) <span class="text-rose-500">*</span>
+                      Product ID <span class="text-rose-500">*</span>
                     </label>
                     <div class="relative">
                       <div
                         class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"
                       >
                         <svg
-                          class="w-4 h-4"
+                          class="w-5 h-5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -668,7 +647,7 @@
                         type="text"
                         plunc-model="productId"
                         plunc-change="onUpdate()"
-                        placeholder="e.g. 1001 or SKU-USB"
+                        placeholder="9812918201900"
                         class="tv-input w-full pl-9 pr-3 py-2.5 text-sm font-mono"
                       />
                     </div>
@@ -677,11 +656,11 @@
 
                 <!-- Input Group: Crypto Options -->
                 <div
-                  class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark-mode:border-slate-800"
+                  class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100 dark-mode:border-slate-700"
                 >
                   <div>
                     <label
-                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-400 mb-2"
                     >
                       Digest Algorithm
                     </label>
@@ -697,7 +676,7 @@
 
                   <div>
                     <label
-                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-400 mb-2"
                     >
                       Reviewer Type
                     </label>
@@ -714,8 +693,23 @@
                   </div>
                 </div>
 
+                <!-- Digest Algorithm Note -->
+                <div
+                  class="tv-card px-4 py-2 border-l-4 border-l-amber-500 flex items-start gap-4"
+                >
+                  <div>
+                    <p
+                      class="text-sm text-slate-600 dark-mode:text-slate-400 mt-1 leading-relaxed"
+                    >
+                      Ensure the Digest Algorithm selected matches your Yotpo
+                      account settings (<strong>HMAC</strong> or
+                      <strong>SHA256</strong>).
+                    </p>
+                  </div>
+                </div>
+
                 <!-- Timestamp Display Card -->
-                <div class="tv-well p-3.5 flex items-center justify-between">
+                <!-- <div class="tv-well p-3.5 flex items-center justify-between">
                   <div
                     class="flex items-center gap-2 text-xs text-slate-500 dark-mode:text-slate-400"
                   >
@@ -739,6 +733,38 @@
                   >
                     {{ timestamp }}
                   </span>
+                </div> -->
+                <div>
+                  <label
+                    class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-400 mb-2"
+                  >
+                    Timestamp <span class="text-rose-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <div
+                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      disabled="true"
+                      plunc-model="timestamp"
+                      class="tv-input w-full pl-9 pr-3 py-2.5 text-sm font-mono"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -754,7 +780,7 @@
 
           <!-- Footer -->
           <footer
-            class="pt-6 pb-12 border-t border-slate-200 dark-mode:border-slate-800 text-center text-xs text-slate-500 dark-mode:text-slate-400 space-y-2"
+            class="pt-6 pb-12 border-t border-slate-200 dark-mode:border-slate-700 text-center text-xs text-slate-500 dark-mode:text-slate-400 space-y-2"
           >
             <p>
               &copy; 2026. Made with ❤️ by
@@ -764,7 +790,6 @@
                 class="text-cyan-800 underline"
                 >Rom Terrado</a
               >.
-
             </p>
             <p class="text-slate-400 dark-mode:text-slate-500">
               Compatible with HMAC-SHA256 and SHA256 cryptographic review
@@ -783,7 +808,7 @@
           class="tv-card p-6 relative overflow-hidden border-t-4 border-t-indigo-600"
         >
           <div
-            class="flex items-center justify-between pb-4 border-b border-slate-200 dark-mode:border-slate-800"
+            class="flex items-center justify-between pb-4 border-b border-slate-200 dark-mode:border-slate-700"
           >
             <div class="flex items-center gap-2">
               <!-- Pulsing indicator -->
@@ -796,13 +821,13 @@
                 ></span>
               </span>
               <h3 class="font-bold text-slate-900 dark-mode:text-white">
-                Cryptographic Signature
+                Signature
               </h3>
             </div>
 
             <div class="flex items-center gap-2">
               <span
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-semibold bg-indigo-50 text-indigo-700 dark-mode:bg-indigo-950 dark-mode:text-indigo-300 border border-indigo-200 dark-mode:border-indigo-800"
+                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold dark-mode:bg-slate-700 dark-mode:text-indigo-400 border border-indigo-200 dark-mode:border-indigo-800"
               >
                 Algorithm: {{ digestAlgorithm }}
               </span>
@@ -833,7 +858,7 @@
                   class="shrink-0 p-2 rounded-lg bg-white dark-mode:bg-slate-800 border border-slate-200 dark-mode:border-slate-700 text-slate-600 dark-mode:text-slate-300 hover:text-indigo-600 dark-mode:hover:text-indigo-400 transition-colors shadow-sm"
                 >
                   <svg
-                    class="w-4 h-4"
+                    class="w-5 h-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -865,10 +890,7 @@
                   d="M5 13l4 4L19 7"
                 />
               </svg>
-              <span
-                >Signature ready! Attach this value to your landing page URL,
-                widget attribute, or cURL request.</span
-              >
+              <span>Signature generated!</span>
             </p>
           </div>
 
@@ -911,7 +933,7 @@
         <!-- Signing Reviewer Data Token Inspector -->
         <div class="tv-card p-6 space-y-4">
           <div
-            class="flex items-center justify-between pb-3 border-b border-slate-200 dark-mode:border-slate-800"
+            class="flex items-center justify-between pb-3 border-b border-slate-200 dark-mode:border-slate-700"
           >
             <div>
               <h3
@@ -984,7 +1006,7 @@
 
             <!-- Section Indicators & Legend Below -->
             <div
-              class="pt-2 border-t border-slate-200 dark-mode:border-slate-800/80 space-y-2"
+              class="pt-2 border-t border-slate-200 dark-mode:border-slate-700/80 space-y-2"
             >
               <div
                 class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark-mode:text-slate-400"
@@ -1040,7 +1062,7 @@
                       >Product ID</span
                     >
                     <span
-                      class="text-[10px] text-emerald-600 dark-mode:text-emerald-400 font-mono"
+                      class="text-[10px] text-emerald-600 dark-mode:text-emerald-400"
                       plunc-if="reviewerType == 'verified_buyer'"
                       >(Included)</span
                     >
@@ -1086,12 +1108,12 @@
                       >Account Secret Key</span
                     >
                     <span
-                      class="text-[10px] text-rose-600 dark-mode:text-rose-400 font-mono"
+                      class="text-[10px] text-rose-600 dark-mode:text-rose-400"
                       plunc-if="digestAlgorithm == 'SHA256'"
                       >(Appended in payload for SHA256)</span
                     >
                     <span
-                      class="text-[10px] text-slate-400 font-mono italic"
+                      class="text-[10px] text-slate-400 italic"
                       plunc-if="digestAlgorithm == 'HMAC'"
                       >(Used as HMAC cryptographic key, not appended in
                       payload)</span
@@ -1172,7 +1194,7 @@
       <div class="tv-card p-6 md:p-8 space-y-8">
         <!-- Header & Segmented Tabs Bar -->
         <div
-          class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-200 dark-mode:border-slate-800"
+          class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-200 dark-mode:border-slate-700"
         >
           <div>
             <div class="flex items-center gap-2">
@@ -1201,7 +1223,7 @@
 
           <!-- Method Selector Buttons (uses plunc-style="getButtonStyle(...)") -->
           <div
-            class="p-1.5 bg-slate-100 dark-mode:bg-slate-900/80 rounded-xl border border-slate-200 dark-mode:border-slate-800 flex items-center gap-1.5 flex-wrap sm:flex-nowrap"
+            class="p-1.5 bg-slate-100 dark-mode:bg-slate-900/80 rounded-xl border border-slate-200 dark-mode:border-slate-700 flex items-center gap-1.5 flex-wrap sm:flex-nowrap"
           >
             <button
               plunc-click="handleSelectMethod('landing_page')"
@@ -1329,7 +1351,7 @@
             </div>
             <pre
               class="p-4 text-xs sm:text-sm font-mono text-emerald-400 break-all whitespace-pre-wrap leading-relaxed overflow-x-auto"
-            ><code id="landingPageUrl">https://landing-pages.yotpo.com/base/#/review?appkey={{appKey}}&sku={{productId}}&product_title=USBthingy&product_description=testing-this-thing&product_url=http:%2F%2Fgkshops.com%2FBigUSBthingy.html&display_name=Arthur&email={{reviewerEmail}}&signature={{signature}}&time_stamp={{timestamp}}&reviewer_type={{reviewerType}}&review_title_required=true</code></pre>
+            ><code id="landingPageUrl">https://landing-pages.yotpo.com/base/#/review?appkey={{appKey}}&sku={{productId}}&product_title=USBthingy&product_url=http:%2F%2Fgkshops.com%2FBigUSBthingy.html&display_name=Arthur&email={{reviewerEmail}}&signature={{signature}}&time_stamp={{timestamp}}&reviewer_type={{reviewerType}}&review_title_required=true</code></pre>
           </div>
 
           <!-- Parameter Reference Table -->
@@ -1340,7 +1362,7 @@
               URL Query Parameters
             </h4>
             <div
-              class="overflow-x-auto rounded-xl border border-slate-200 dark-mode:border-slate-800"
+              class="overflow-x-auto rounded-xl border border-slate-200 dark-mode:border-slate-700"
             >
               <table class="tv-table">
                 <thead>
@@ -1569,7 +1591,7 @@
               DOM Data Attributes
             </h4>
             <div
-              class="overflow-x-auto rounded-xl border border-slate-200 dark-mode:border-slate-800"
+              class="overflow-x-auto rounded-xl border border-slate-200 dark-mode:border-slate-700"
             >
               <table class="tv-table">
                 <thead>
@@ -1747,7 +1769,6 @@
     "domain": "http://www.shop.com",
     "sku": "{{productId}}",
     "product_title": "Phone",
-    "product_description": "Smart Phone",
     "product_url": "http://www.shop.com/phone.html",
     "product_image_url": "http://www.shop.com/phone.jpg",
     "display_name": "John Smith",
@@ -1769,7 +1790,7 @@
               API Body Parameters
             </h4>
             <div
-              class="overflow-x-auto rounded-xl border border-slate-200 dark-mode:border-slate-800"
+              class="overflow-x-auto rounded-xl border border-slate-200 dark-mode:border-slate-700"
             >
               <table class="tv-table">
                 <thead>
