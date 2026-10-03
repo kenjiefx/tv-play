@@ -14,6 +14,20 @@
       rel="stylesheet"
     />
 
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-QXTRN9LV07"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-QXTRN9LV07");
+    </script>
+
     <!-- Plunc Framework -->
     <script
       type="text/javascript"
@@ -422,6 +436,7 @@
             >
               <!-- Preset Demo Button -->
               <button
+                data-ga-event="fill_demo_data"
                 type="button"
                 plunc-click="fillDemoData()"
                 title="Fill sample credentials to immediately test"
@@ -586,6 +601,7 @@
                         Secret Key <span class="text-rose-500">*</span>
                       </label>
                       <button
+                        data-ga-event="toggle_secret_key_visibility"
                         type="button"
                         plunc-click="toggleSecretKeyInputType()"
                         class="text-xs text-indigo-600 hover:text-indigo-500 dark-mode:text-indigo-400 font-medium"
@@ -911,6 +927,7 @@
                   </div>
                 </div>
                 <button
+                  data-ga-event="copy_signature"
                   type="button"
                   plunc-click="copySignature()"
                   title="Copy Signature"
@@ -1008,6 +1025,7 @@
 
             <!-- Copy Raw Message Button via Plunc directive -->
             <button
+              data-ga-event="copy_prehash_message"
               type="button"
               plunc-click="copyMessage()"
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors shadow-sm shrink-0"
@@ -1286,6 +1304,7 @@
             class="p-1.5 bg-slate-100 dark-mode:bg-slate-900/80 rounded-xl border border-slate-200 dark-mode:border-slate-700 flex items-center gap-1.5 flex-wrap sm:flex-nowrap"
           >
             <button
+              data-ga-event="select_landing_page"
               plunc-click="handleSelectMethod('landing_page')"
               plunc-style="getButtonStyle('landing_page')"
               class="method-tab-btn flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all"
@@ -1307,6 +1326,7 @@
             </button>
 
             <button
+              data-ga-event="select_reviews_widget"
               plunc-click="handleSelectMethod('reviews_widget')"
               plunc-style="getButtonStyle('reviews_widget')"
               class="method-tab-btn flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all"
@@ -1328,6 +1348,7 @@
             </button>
 
             <button
+              data-ga-event="select_api_endpoint"
               plunc-click="handleSelectMethod('api_endpoint')"
               plunc-style="getButtonStyle('api_endpoint')"
               class="method-tab-btn flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all"
@@ -1389,6 +1410,7 @@
                 >
               </div>
               <button
+                data-ga-event="copy_landing_page_url"
                 type="button"
                 plunc-click="copyLandingPageUrl()"
                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
@@ -1614,6 +1636,7 @@
                 >
               </div>
               <button
+                data-ga-event="copy_dom_html"
                 type="button"
                 plunc-click="copyDOMElementText()"
                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
@@ -1802,6 +1825,7 @@
                 >
               </div>
               <button
+                data-ga-event="copy_curl_command"
                 type="button"
                 plunc-click="copyCurlCommandText()"
                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
@@ -2160,5 +2184,19 @@
         <span data-toast-message></span>
       </div>
     </template>
+
+    <script type="text/javascript">
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-ga-event]");
+        if (!button) return;
+        const eventName = button.getAttribute("data-ga-event");
+        const buttonLabel =
+          button.innerText || button.getAttribute("aria-label") || "unlabeled";
+        gtag("event", "button_click", {
+          button_name: eventName,
+          button_text: buttonLabel,
+        });
+      });
+    </script>
   </body>
 </html>
