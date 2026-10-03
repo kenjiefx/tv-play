@@ -94,29 +94,16 @@ import {
       $scope.reviewerEmail = "";
       $scope.productId = "";
       $scope.signature = "";
-      $app.ready(() => {
-        const isDarkMode = localStorage.getItem("isDarkMode") === "true";
-        $scope.isDarkMode = isDarkMode;
-        document.body.classList.toggle("dark-mode", isDarkMode);
-        /**
-         * @TODO Investigate the issue wherein the toggling the dark mode affects
-         * the rendering of the SubmissionMethod component without any errors.
-         * For now, we will keep the patch local to the DarkModeToggler block only.
-         */
-        $patch("DarkModeToggler");
+      $app.ready(async () => {
+        $scope.isDarkMode = localStorage.getItem("isDarkMode") === "true";
+        await $patch("DarkModeToggler");
       });
-      $scope.toggleDarkMode = () => {
+      $scope.toggleDarkMode = async () => {
         const isDarkMode = !(localStorage.getItem("isDarkMode") === "true");
         localStorage.setItem("isDarkMode", isDarkMode.toString());
-        // Update the UI to reflect the dark mode change
         $scope.isDarkMode = isDarkMode;
         document.body.classList.toggle("dark-mode", isDarkMode);
-        /**
-         * @TODO Investigate the issue wherein the toggling the dark mode affects
-         * the rendering of the SubmissionMethod component without any errors.
-         * For now, we will keep the patch local to the DarkModeToggler block only.
-         */
-        $patch("DarkModeToggler");
+        await $patch("DarkModeToggler");
       };
       $scope.onUpdate = () => {
         const {

@@ -63,10 +63,14 @@
 
     <!-- Immediate theme setup to prevent flicker -->
     <script>
-      if (localStorage.getItem("isDarkMode") === "true") {
-        document.documentElement.classList.add("dark-mode");
-        document.body?.classList.add("dark-mode");
-      }
+      (() => {
+        setTimeout(() => {
+          if (localStorage.getItem("isDarkMode") === "true") {
+            document.documentElement.classList.add("dark-mode");
+            document.body?.classList.add("dark-mode");
+          }
+        }, 100);
+      })();
     </script>
 
     <!-- Custom CSS for Theme Transitions, Dark Mode, and Polish -->
@@ -437,7 +441,7 @@
                 <span>Fill Demo Data</span>
               </button>
 
-              <!-- Dark Mode Switch - Wrapped in plunc-block="DarkModeToggler" -->
+              <!-- Dark Mode Switch -->
               <div plunc-block="DarkModeToggler" class="flex items-center">
                 <label
                   class="relative inline-flex items-center cursor-pointer select-none"
@@ -451,22 +455,58 @@
                   <div
                     class="w-12 h-6 bg-slate-200 dark-mode:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all after:shadow-sm peer-checked:bg-indigo-600 transition-colors"
                   ></div>
-                  <span
-                    class="ml-2.5 text-xs font-semibold text-slate-600 dark-mode:text-slate-300 flex items-center gap-1"
-                  >
-                    <svg
-                      class="w-3.5 h-3.5 text-amber-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+                  <div plunc-if="isDarkMode == false">
+                    <span
+                      class="ml-2.5 text-xs font-semibold text-slate-600 dark-mode:text-slate-300 flex items-center gap-1"
                     >
-                      <path
-                        fill-rule="evenodd"
-                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                    <span>Dark</span>
-                  </span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-sun"
+                      >
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v2" />
+                        <path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" />
+                        <path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" />
+                        <path d="M20 12h2" />
+                        <path d="m6.34 17.66-1.41 1.41" />
+                        <path d="m19.07 4.93-1.41 1.41" />
+                      </svg>
+                      <span>Light</span>
+                    </span>
+                  </div>
+                  <div plunc-if="isDarkMode == true">
+                    <span
+                      class="ml-2.5 text-xs font-semibold text-slate-600 dark-mode:text-slate-300 flex items-center gap-1"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-moon"
+                      >
+                        <path
+                          d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+                        />
+                      </svg>
+                      <span>Dark</span>
+                    </span>
+                  </div>
                 </label>
               </div>
             </div>
