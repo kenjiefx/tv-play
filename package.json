@@ -4,7 +4,7 @@
   "description": "Playground for Yotpo's Trusted Vendor feature",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "tsc && node ./bin/deploy.js"
   },
   "repository": {
     "type": "git",
