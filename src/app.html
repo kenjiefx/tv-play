@@ -1,417 +1,1751 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trusted Vendor Playground</title>
+    <title>Yotpo Trusted Vendor Playground</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Plunc Framework -->
     <script
       type="text/javascript"
       src="https://cdn.jsdelivr.net/gh/kenjiefx/plunc/dist/plunc.min.js"
     ></script>
+
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: ["class", ".dark-mode"],
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [
+                "Inter",
+                "-apple-system",
+                "BlinkMacSystemFont",
+                "Segoe UI",
+                "Roboto",
+                "sans-serif",
+              ],
+              mono: [
+                "JetBrains Mono",
+                "ui-monospace",
+                "SFMono-Regular",
+                "Menlo",
+                "Monaco",
+                "Consolas",
+                "monospace",
+              ],
+            },
+            colors: {
+              brand: {
+                50: "#eef2ff",
+                100: "#e0e7ff",
+                200: "#c7d2fe",
+                500: "#6366f1",
+                600: "#4f46e5",
+                700: "#4338ca",
+                800: "#3730a3",
+                900: "#312e81",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Immediate theme setup to prevent flicker -->
+    <script>
+      if (localStorage.getItem("isDarkMode") === "true") {
+        document.documentElement.classList.add("dark-mode");
+        document.body?.classList.add("dark-mode");
+      }
+    </script>
+
+    <!-- Custom CSS for Theme Transitions, Dark Mode, and Polish -->
+    <style>
+      :root {
+        --bg-page: #f8fafc;
+        --bg-card: #ffffff;
+        --border-card: #e2e8f0;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-muted: #64748b;
+        --well-bg: #f1f5f9;
+        --well-border: #e2e8f0;
+        --input-bg: #ffffff;
+        --input-border: #cbd5e1;
+      }
+
+      body.dark-mode {
+        --bg-page: #0b0f19;
+        --bg-card: #111827;
+        --border-card: #1f293d;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --well-bg: #0d1525;
+        --well-border: #1c273c;
+        --input-bg: #090e17;
+        --input-border: #22324f;
+        background-color: #0b0f19 !important;
+        color: #f8fafc !important;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        background-color: var(--bg-page);
+        color: var(--text-primary);
+        transition:
+          background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+          color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 100vh;
+      }
+
+      /* Card styling */
+      .tv-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-card);
+        border-radius: 1rem;
+        box-shadow:
+          0 1px 3px 0 rgba(0, 0, 0, 0.05),
+          0 1px 2px -1px rgba(0, 0, 0, 0.05);
+        transition: all 0.25s ease;
+      }
+
+      body.dark-mode .tv-card {
+        background-color: #111827 !important;
+        border-color: #1e293b !important;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.35),
+          0 2px 4px -2px rgba(0, 0, 0, 0.3) !important;
+      }
+
+      /* Wells & containers */
+      .tv-well {
+        background-color: var(--well-bg);
+        border: 1px solid var(--well-border);
+        border-radius: 0.75rem;
+      }
+
+      body.dark-mode .tv-well {
+        background-color: #090e17 !important;
+        border-color: #1b263b !important;
+      }
+
+      /* Input styling */
+      .tv-input {
+        background-color: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--text-primary);
+        border-radius: 0.625rem;
+        transition: all 0.15s ease-in-out;
+      }
+
+      .tv-input:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+      }
+
+      body.dark-mode .tv-input {
+        background-color: #090e17 !important;
+        border-color: #22324f !important;
+        color: #f8fafc !important;
+      }
+
+      body.dark-mode .tv-input::placeholder {
+        color: #475569;
+      }
+
+      body.dark-mode .tv-input:focus {
+        border-color: #818cf8 !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.28) !important;
+      }
+
+      /* Method Tab Buttons - Works directly with plunc-style returning bg-blue-700 / bg-blue-500 */
+      .method-tab-btn {
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+      }
+
+      .method-tab-btn.bg-blue-700 {
+        background: linear-gradient(
+          135deg,
+          #2563eb 0%,
+          #1d4ed8 100%
+        ) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.45) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        font-weight: 600 !important;
+      }
+
+      .method-tab-btn.bg-blue-500 {
+        background: transparent !important;
+        color: #64748b !important;
+        box-shadow: none !important;
+      }
+
+      .method-tab-btn.bg-blue-500:hover {
+        background: rgba(148, 163, 184, 0.12) !important;
+        color: #0f172a !important;
+      }
+
+      body.dark-mode .method-tab-btn.bg-blue-700 {
+        background: linear-gradient(
+          135deg,
+          #4f46e5 0%,
+          #3b82f6 100%
+        ) !important;
+        box-shadow: 0 4px 14px -2px rgba(79, 70, 229, 0.5) !important;
+      }
+
+      body.dark-mode .method-tab-btn.bg-blue-500 {
+        color: #94a3b8 !important;
+      }
+
+      body.dark-mode .method-tab-btn.bg-blue-500:hover {
+        background: rgba(255, 255, 255, 0.06) !important;
+        color: #f8fafc !important;
+      }
+
+      /* Tables */
+      .tv-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      .tv-table th {
+        background-color: #f8fafc;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      body.dark-mode .tv-table th {
+        background-color: #090e17 !important;
+        color: #cbd5e1 !important;
+        border-bottom-color: #1e293b !important;
+      }
+
+      .tv-table td {
+        padding: 0.875rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.875rem;
+        color: #334155;
+      }
+
+      body.dark-mode .tv-table td {
+        border-bottom-color: #162032 !important;
+        color: #cbd5e1 !important;
+      }
+
+      .tv-table tbody tr:hover td {
+        background-color: rgba(241, 245, 249, 0.6);
+      }
+
+      body.dark-mode .tv-table tbody tr:hover td {
+        background-color: rgba(255, 255, 255, 0.02) !important;
+      }
+
+      .tv-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Custom scrollbars */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 9999px;
+      }
+      body.dark-mode ::-webkit-scrollbar-thumb {
+        background: #334155;
+      }
+    </style>
+
     <script type="module" src="./app.js"></script>
   </head>
-  <body>
+  <body class="selection:bg-indigo-500 selection:text-white">
+    <!-- Plunc Application Mount Point -->
     <main plunc-app="App"></main>
+
+    <!-- App Root Template -->
     <template plunc-name="App">
       <section plunc-component="Main"></section>
     </template>
+
+    <!-- Main Component Template -->
     <template plunc-name="Main">
-      <div class="bg-white p-8 rounded-xl shadow-md text-center">
-        <header>
-          <h1 class="text-2xl font-bold text-gray-800 mb-2">
-            Trusted Vendor Playground
-          </h1>
-          <div plunc-block="DarkModeToggler">
-            <input
-              type="checkbox"
-              plunc-model="isDarkMode"
-              plunc-change="toggleDarkMode()"
-            />
-            Dark Mode
-          </div>
-        </header>
+      <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto space-y-8">
+          <!-- Top Navigation & Header Bar -->
+          <header
+            class="tv-card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 shrink-0"
+              >
+                <!-- Verified Shield Icon -->
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2.5 flex-wrap">
+                  <h1
+                    class="text-2xl font-bold tracking-tight text-slate-900 dark-mode:text-white"
+                  >
+                    Trusted Vendor Playground
+                  </h1>
+                </div>
+                <p
+                  class="text-sm text-slate-500 dark-mode:text-slate-400 mt-0.5"
+                >
+                  Interactive cryptographic signature engine & payload inspector
+                  for verified reviews
+                </p>
+              </div>
+            </div>
 
-        <p class="text-gray-600 mb-4">
-          Trusted Vendor creates verified reviewers or verified buyers without
-          sending the reviewer an automatic review request or confirmation
-          email.
-        </p>
-        <p>
-          Important: Please check if the Digest Algorithm is setup in your Yotpo
-          account is HMAC or SHA256. Reviews will not be processed correctly if
-          the Digest Algorithm does not match the one configured in your Yotpo
-          account.
-        </p>
+            <!-- Action Controls: Demo Data & Dark Mode Toggler -->
+            <div
+              class="flex items-center gap-4 self-start md:self-center shrink-0"
+            >
+              <!-- Preset Demo Button -->
+              <button
+                type="button"
+                onclick="fillDemoData()"
+                title="Fill sample credentials to immediately test"
+                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 dark-mode:bg-slate-800 dark-mode:text-slate-300 dark-mode:hover:bg-slate-700 transition-colors border border-slate-200 dark-mode:border-slate-700"
+              >
+                <svg
+                  class="w-3.5 h-3.5 text-indigo-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+                <span>Fill Demo Data</span>
+              </button>
 
-        <label class="block text-gray-700 mb-2">App Key</label>
-        <input
-          type="text"
-          plunc-model="appKey"
-          plunc-change="onUpdate()"
-          placeholder="Enter something"
-          class="border border-gray-300 rounded-lg p-2 w-full"
-        />
-        <label class="block text-gray-700 mb-2">Secret Key</label>
-        <input
-          type="text"
-          plunc-model="secretKey"
-          plunc-change="onUpdate()"
-          placeholder="Enter something"
-          class="border border-gray-300 rounded-lg p-2 w-full"
-        />
-        <div>
-          <label class="block text-gray-700 mb-2">Reviewer Email</label>
-          <input
-            type="text"
-            plunc-model="reviewerEmail"
-            plunc-change="onUpdate()"
-            placeholder="Enter something"
-            class="border border-gray-300 rounded-lg p-2 w-full"
-          />
-        </div>
-        <div>
-          <label class="block text-gray-700 mb-2">Product ID</label>
-          <input
-            type="text"
-            plunc-model="productId"
-            plunc-change="onUpdate()"
-            placeholder="Enter something"
-            class="border border-gray-300 rounded-lg p-2 w-full"
-          />
-        </div>
-        <div class="flex items-center">
-          <div>
-            <label class="block text-gray-700 mb-2">Digest Algorithm</label>
-            <select
-              plunc-model="digestAlgorithm"
-              plunc-change="onUpdate()"
-              class="border border-gray-300 rounded-lg p-2 w-full"
+              <!-- Dark Mode Switch - Wrapped in plunc-block="DarkModeToggler" -->
+              <div plunc-block="DarkModeToggler" class="flex items-center">
+                <label
+                  class="relative inline-flex items-center cursor-pointer select-none"
+                >
+                  <input
+                    type="checkbox"
+                    plunc-model="isDarkMode"
+                    plunc-change="toggleDarkMode()"
+                    class="sr-only peer"
+                  />
+                  <div
+                    class="w-12 h-6 bg-slate-200 dark-mode:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all after:shadow-sm peer-checked:bg-indigo-600 transition-colors"
+                  ></div>
+                  <span
+                    class="ml-2.5 text-xs font-semibold text-slate-600 dark-mode:text-slate-300 flex items-center gap-1"
+                  >
+                    <svg
+                      class="w-3.5 h-3.5 text-amber-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <span>Dark</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </header>
+
+          <!-- Documentation & Overview Callout -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div
+              class="md:col-span-2 tv-card p-6 border-l-4 border-l-indigo-600 flex items-start gap-4"
             >
-              <option value="HMAC">HMAC</option>
-              <option value="SHA256">SHA256</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-gray-700 mb-2">Reviewer Type</label>
-            <select
-              plunc-model="reviewerType"
-              plunc-change="onUpdate()"
-              class="border border-gray-300 rounded-lg p-2 w-full"
+              <div
+                class="p-2.5 rounded-lg bg-indigo-50 dark-mode:bg-indigo-950/60 text-indigo-600 dark-mode:text-indigo-400 shrink-0"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h2
+                  class="text-sm font-bold uppercase tracking-wider text-slate-900 dark-mode:text-white"
+                >
+                  About Trusted Vendor
+                </h2>
+                <p
+                  class="text-sm text-slate-600 dark-mode:text-slate-300 mt-1 leading-relaxed"
+                >
+                  Trusted Vendor enables merchants to programmatically create
+                  verified buyers or verified reviewers without sending the
+                  reviewer an automatic review request or confirmation email.
+                  Reviews are cryptographically verified using a generated
+                  signature attached to each submission.
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="tv-card p-6 border-l-4 border-l-amber-500 flex items-start gap-4"
             >
-              <option value="verified_buyer">Verified Buyer</option>
-              <option value="verified_reviewer">Verified Reviewer</option>
-            </select>
+              <div
+                class="p-2.5 rounded-lg bg-amber-50 dark-mode:bg-amber-950/60 text-amber-600 dark-mode:text-amber-400 shrink-0"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h2
+                  class="text-sm font-bold uppercase tracking-wider text-slate-900 dark-mode:text-white"
+                >
+                  Digest Algorithm Note
+                </h2>
+                <p
+                  class="text-xs text-slate-600 dark-mode:text-slate-300 mt-1 leading-relaxed"
+                >
+                  Ensure the Digest Algorithm selected matches your Yotpo
+                  account settings (<strong>HMAC</strong> or
+                  <strong>SHA256</strong>). Submissions will fail verification
+                  if the algorithm does not match.
+                </p>
+              </div>
+            </div>
           </div>
+
+          <!-- Main Interactive Playground: 2-Column Responsive Layout -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <!-- Left Column: Form & Configuration (5 cols) -->
+            <div class="lg:col-span-5 space-y-6">
+              <div class="tv-card p-6 space-y-6">
+                <div
+                  class="flex items-center justify-between pb-4 border-b border-slate-200 dark-mode:border-slate-800"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <svg
+                      class="w-5 h-5 text-indigo-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    <h3 class="font-bold text-slate-900 dark-mode:text-white">
+                      Parameters & Credentials
+                    </h3>
+                  </div>
+                  <span class="text-xs text-slate-400 font-mono"
+                    >Live Inputs</span
+                  >
+                </div>
+
+                <!-- Input Group: Account Credentials -->
+                <div class="space-y-4">
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                    >
+                      Yotpo App Key <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                          />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        plunc-model="appKey"
+                        plunc-change="onUpdate()"
+                        placeholder="e.g. k5J4L3M2N1..."
+                        class="tv-input w-full pl-9 pr-3 py-2.5 text-sm font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                      <label
+                        class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 uppercase tracking-wider"
+                      >
+                        Account Secret Key <span class="text-rose-500">*</span>
+                      </label>
+                      <button
+                        type="button"
+                        onclick="toggleSecretVisibility()"
+                        class="text-xs text-indigo-600 hover:text-indigo-500 dark-mode:text-indigo-400 font-medium"
+                      >
+                        <span id="secret-visibility-text">Show Secret</span>
+                      </button>
+                    </div>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                          />
+                        </svg>
+                      </div>
+                      <input
+                        type="password"
+                        id="secretKeyInput"
+                        plunc-model="secretKey"
+                        plunc-change="onUpdate()"
+                        placeholder="e.g. secret_987654321..."
+                        class="tv-input w-full pl-9 pr-3 py-2.5 text-sm font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Input Group: Reviewer & Product Details -->
+                <div
+                  class="space-y-4 pt-2 border-t border-slate-100 dark-mode:border-slate-800"
+                >
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                    >
+                      Reviewer Email <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                          />
+                        </svg>
+                      </div>
+                      <input
+                        type="email"
+                        plunc-model="reviewerEmail"
+                        plunc-change="onUpdate()"
+                        placeholder="e.g. customer@example.com"
+                        class="tv-input w-full pl-9 pr-3 py-2.5 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                    >
+                      Product ID (SKU) <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                          />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        plunc-model="productId"
+                        plunc-change="onUpdate()"
+                        placeholder="e.g. 1001 or SKU-USB"
+                        class="tv-input w-full pl-9 pr-3 py-2.5 text-sm font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Input Group: Crypto Options -->
+                <div
+                  class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark-mode:border-slate-800"
+                >
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                    >
+                      Digest Algorithm
+                    </label>
+                    <select
+                      plunc-model="digestAlgorithm"
+                      plunc-change="onUpdate()"
+                      class="tv-input w-full p-2.5 text-sm font-medium"
+                    >
+                      <option value="HMAC">HMAC</option>
+                      <option value="SHA256">SHA256</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-slate-700 dark-mode:text-slate-300 mb-1.5 uppercase tracking-wider"
+                    >
+                      Reviewer Type
+                    </label>
+                    <select
+                      plunc-model="reviewerType"
+                      plunc-change="onUpdate()"
+                      class="tv-input w-full p-2.5 text-sm font-medium"
+                    >
+                      <option value="verified_buyer">Verified Buyer</option>
+                      <option value="verified_reviewer">
+                        Verified Reviewer
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Timestamp Display Card -->
+                <div class="tv-well p-3.5 flex items-center justify-between">
+                  <div
+                    class="flex items-center gap-2 text-xs text-slate-500 dark-mode:text-slate-400"
+                  >
+                    <svg
+                      class="w-4 h-4 text-slate-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span>Epoch Timestamp:</span>
+                  </div>
+                  <span
+                    class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400 bg-indigo-50 dark-mode:bg-indigo-950/60 px-2 py-0.5 rounded"
+                  >
+                    {{ timestamp }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Signature Engine & Inspector (7 cols) -->
+            <div class="lg:col-span-7 space-y-6">
+              <section plunc-component="SignatureViewer"></section>
+            </div>
+          </div>
+
+          <!-- Bottom Full-Width Section: Submission Implementation Methods -->
+          <section plunc-component="SubmissionMethod"></section>
+
+          <!-- Footer -->
+          <footer
+            class="pt-6 pb-12 border-t border-slate-200 dark-mode:border-slate-800 text-center text-xs text-slate-500 dark-mode:text-slate-400 space-y-2"
+          >
+            <p>
+              &copy; 2026. Made with ❤️ by
+              <a
+                href="https://github.com/kenjiefx/widget-lab"
+                target="_blank"
+                class="text-cyan-800 underline"
+                >Rom Terrado</a
+              >.
+
+            </p>
+            <p class="text-slate-400 dark-mode:text-slate-500">
+              Compatible with HMAC-SHA256 and SHA256 cryptographic review
+              signatures.
+            </p>
+          </footer>
         </div>
-        <p class="text-gray-600 mb-4">Timestamp: {{ timestamp }}</p>
-        <section plunc-component="SignatureViewer"></section>
-        <section plunc-component="SubmissionMethod"></section>
       </div>
     </template>
 
+    <!-- SignatureViewer Component Template -->
     <template plunc-name="SignatureViewer">
-      <h3>Digest Algorithm: {{ digestAlgorithm }}</h3>
-      <p plunc-if="digestAlgorithm == 'HMAC'">
-        HMAC is a keyed-hash message authentication code used for data integrity
-        and authentication.
-      </p>
-      <p plunc-if="digestAlgorithm == 'SHA256'">
-        SHA256 is a cryptographic hash function that produces a fixed-size hash
-        value from input data, ensuring data integrity.
-      </p>
+      <div class="space-y-6">
+        <!-- Live Signature Result Box -->
+        <div
+          class="tv-card p-6 relative overflow-hidden border-t-4 border-t-indigo-600"
+        >
+          <div
+            class="flex items-center justify-between pb-4 border-b border-slate-200 dark-mode:border-slate-800"
+          >
+            <div class="flex items-center gap-2">
+              <!-- Pulsing indicator -->
+              <span class="relative flex h-3 w-3">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"
+                ></span>
+              </span>
+              <h3 class="font-bold text-slate-900 dark-mode:text-white">
+                Cryptographic Signature
+              </h3>
+            </div>
 
-      <!-- Message Explanation -->
-      <h3>Signing Reviewer Data</h3>
-      <p>
-        To verify the integrity of the posted data and to ensure the creator of
-        the review is the verified vendor, requires attaching a digested hash
-        signature.
-      </p>
-      <div class="flex items-center">
-        <div class="flex items-center">
-          <span class="text-cyan-500">{{reviewerEmail}}</span>
-          <span class="text-amber-400">{{reviewerType}}</span>
-          <span
-            class="text-green-500"
-            plunc-if="reviewerType == 'verified_reviewer'"
+            <div class="flex items-center gap-2">
+              <span
+                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-semibold bg-indigo-50 text-indigo-700 dark-mode:bg-indigo-950 dark-mode:text-indigo-300 border border-indigo-200 dark-mode:border-indigo-800"
+              >
+                Algorithm: {{ digestAlgorithm }}
+              </span>
+            </div>
+          </div>
+
+          <!-- When signature is generated -->
+          <div plunc-if="signature !== ''" class="mt-4 space-y-4">
+            <div class="tv-well p-4 relative group">
+              <div class="flex items-start justify-between gap-4">
+                <div class="space-y-1 overflow-hidden">
+                  <div
+                    class="text-[11px] font-semibold uppercase tracking-wider text-slate-400"
+                  >
+                    Hexadecimal Signature Digest
+                  </div>
+                  <div
+                    id="signatureText"
+                    class="font-mono text-sm sm:text-base font-bold text-emerald-600 dark-mode:text-emerald-400 break-all select-all leading-relaxed"
+                  >
+                    {{ signature }}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onclick="copySignatureValue(this)"
+                  title="Copy Signature"
+                  class="shrink-0 p-2 rounded-lg bg-white dark-mode:bg-slate-800 border border-slate-200 dark-mode:border-slate-700 text-slate-600 dark-mode:text-slate-300 hover:text-indigo-600 dark-mode:hover:text-indigo-400 transition-colors shadow-sm"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <p
+              class="text-xs text-slate-500 dark-mode:text-slate-400 flex items-center gap-1.5"
+            >
+              <svg
+                class="w-4 h-4 text-emerald-500 shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              <span
+                >Signature ready! Attach this value to your landing page URL,
+                widget attribute, or cURL request.</span
+              >
+            </p>
+          </div>
+
+          <!-- When signature is pending -->
+          <div
+            plunc-if="signature === ''"
+            class="mt-4 p-6 tv-well text-center space-y-2"
           >
-            {{productId}}
-          </span>
-          <span class="text-purple-500">{{timestamp}}</span>
-          <span class="text-red-500" plunc-if="digestAlgorithm == 'SHA256'">
-            {{secretKey}}
-          </span>
+            <div
+              class="w-10 h-10 mx-auto rounded-full bg-slate-200 dark-mode:bg-slate-800 flex items-center justify-center text-slate-500"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <h4
+              class="text-sm font-semibold text-slate-700 dark-mode:text-slate-200"
+            >
+              Signature Awaiting Input
+            </h4>
+            <p
+              class="text-xs text-slate-500 dark-mode:text-slate-400 max-w-sm mx-auto"
+            >
+              Please fill in all required fields (App Key, Secret Key, Reviewer
+              Email, and Product ID) to calculate the authentication signature.
+            </p>
+          </div>
         </div>
-        <div>
-          <button
-            plunc-click="copyMessage()"
-            class="bg-blue-500 text-white px-4 py-2 rounded-lg"
+
+        <!-- Signing Reviewer Data Token Inspector -->
+        <div class="tv-card p-6 space-y-4">
+          <div
+            class="flex items-center justify-between pb-3 border-b border-slate-200 dark-mode:border-slate-800"
           >
-            Copy
-          </button>
+            <div>
+              <h3
+                class="font-bold text-slate-900 dark-mode:text-white text-base"
+              >
+                Signing Reviewer Data
+              </h3>
+              <p class="text-xs text-slate-500 dark-mode:text-slate-400 mt-0.5">
+                The exact message concatenated before passing into the
+                cryptographic function
+              </p>
+            </div>
+
+            <!-- Copy Raw Message Button via Plunc directive -->
+            <button
+              type="button"
+              plunc-click="copyMessage()"
+              onclick="showToast('Raw signing payload copied to clipboard!')"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors shadow-sm shrink-0"
+            >
+              <svg
+                class="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+              <span>Copy Message</span>
+            </button>
+          </div>
+
+          <!-- Plain Concatenated String Display & Color-Coded Indicators -->
+          <div class="tv-well p-4 space-y-4">
+            <div class="flex items-center justify-between">
+              <div
+                class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark-mode:text-slate-400"
+              >
+                Concatenated Plain String
+              </div>
+              <span
+                class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200 dark-mode:bg-slate-800 text-slate-600 dark-mode:text-slate-400"
+              >
+                Pre-Hash Payload
+              </span>
+            </div>
+
+            <!-- Plain Continuous Color-Coded String (No Blocks, No Plus Signs) -->
+            <div
+              class="p-3.5 rounded-lg bg-slate-900 border border-slate-700/80 shadow-inner font-mono text-sm sm:text-base break-all select-all leading-relaxed tracking-wide"
+            >
+              <span class="text-cyan-400 font-semibold">{{reviewerEmail}}</span
+              ><span class="text-amber-400 font-semibold">{{reviewerType}}</span
+              ><span
+                class="text-emerald-400 font-semibold"
+                plunc-if="reviewerType == 'verified_buyer'"
+                >{{productId}}</span
+              ><span class="text-purple-400 font-semibold">{{timestamp}}</span
+              ><span
+                class="text-rose-400 font-semibold"
+                plunc-if="digestAlgorithm == 'SHA256'"
+                >{{secretKey}}</span
+              >
+            </div>
+
+            <!-- Section Indicators & Legend Below -->
+            <div
+              class="pt-2 border-t border-slate-200 dark-mode:border-slate-800/80 space-y-2"
+            >
+              <div
+                class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark-mode:text-slate-400"
+              >
+                Color Key & Message Components
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <!-- Indicator: Reviewer Email -->
+                <div
+                  class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-100 dark-mode:bg-slate-800/70 border border-slate-200 dark-mode:border-slate-700/80"
+                >
+                  <span
+                    class="w-3 h-3 rounded-full bg-cyan-400 shrink-0 shadow-sm shadow-cyan-400/50"
+                  ></span>
+                  <span
+                    class="font-semibold text-slate-800 dark-mode:text-slate-200"
+                    >Reviewer Email</span
+                  >
+                  <span
+                    class="text-[10px] text-slate-500 dark-mode:text-slate-400 font-mono ml-auto"
+                    >email</span
+                  >
+                </div>
+
+                <!-- Indicator: Reviewer Type -->
+                <div
+                  class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-100 dark-mode:bg-slate-800/70 border border-slate-200 dark-mode:border-slate-700/80"
+                >
+                  <span
+                    class="w-3 h-3 rounded-full bg-amber-400 shrink-0 shadow-sm shadow-amber-400/50"
+                  ></span>
+                  <span
+                    class="font-semibold text-slate-800 dark-mode:text-slate-200"
+                    >Reviewer Type</span
+                  >
+                  <span
+                    class="text-[10px] text-slate-500 dark-mode:text-slate-400 font-mono ml-auto"
+                    >reviewer_type</span
+                  >
+                </div>
+
+                <!-- Indicator: Product ID -->
+                <div
+                  class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-100 dark-mode:bg-slate-800/70 border border-slate-200 dark-mode:border-slate-700/80"
+                >
+                  <span
+                    class="w-3 h-3 rounded-full bg-emerald-400 shrink-0 shadow-sm shadow-emerald-400/50"
+                  ></span>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span
+                      class="font-semibold text-slate-800 dark-mode:text-slate-200"
+                      >Product ID</span
+                    >
+                    <span
+                      class="text-[10px] text-emerald-600 dark-mode:text-emerald-400 font-mono"
+                      plunc-if="reviewerType == 'verified_buyer'"
+                      >(Included)</span
+                    >
+                    <span
+                      class="text-[10px] text-slate-400 font-mono italic"
+                      plunc-if="reviewerType == 'verified_reviewer'"
+                      >(Omitted for Verified Reviewer)</span
+                    >
+                  </div>
+                  <span
+                    class="text-[10px] text-slate-500 dark-mode:text-slate-400 font-mono ml-auto"
+                    >sku</span
+                  >
+                </div>
+
+                <!-- Indicator: Timestamp -->
+                <div
+                  class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-100 dark-mode:bg-slate-800/70 border border-slate-200 dark-mode:border-slate-700/80"
+                >
+                  <span
+                    class="w-3 h-3 rounded-full bg-purple-400 shrink-0 shadow-sm shadow-purple-400/50"
+                  ></span>
+                  <span
+                    class="font-semibold text-slate-800 dark-mode:text-slate-200"
+                    >Timestamp</span
+                  >
+                  <span
+                    class="text-[10px] text-slate-500 dark-mode:text-slate-400 font-mono ml-auto"
+                    >time_stamp</span
+                  >
+                </div>
+
+                <!-- Indicator: Secret Key -->
+                <div
+                  class="sm:col-span-2 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-100 dark-mode:bg-slate-800/70 border border-slate-200 dark-mode:border-slate-700/80"
+                >
+                  <span
+                    class="w-3 h-3 rounded-full bg-rose-400 shrink-0 shadow-sm shadow-rose-400/50"
+                  ></span>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span
+                      class="font-semibold text-slate-800 dark-mode:text-slate-200"
+                      >Account Secret Key</span
+                    >
+                    <span
+                      class="text-[10px] text-rose-600 dark-mode:text-rose-400 font-mono"
+                      plunc-if="digestAlgorithm == 'SHA256'"
+                      >(Appended in payload for SHA256)</span
+                    >
+                    <span
+                      class="text-[10px] text-slate-400 font-mono italic"
+                      plunc-if="digestAlgorithm == 'HMAC'"
+                      >(Used as HMAC cryptographic key, not appended in
+                      payload)</span
+                    >
+                  </div>
+                  <span
+                    class="text-[10px] text-slate-500 dark-mode:text-slate-400 font-mono ml-auto"
+                    >secret</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Algorithm Specifications & Explanations -->
+          <div class="space-y-3 pt-2">
+            <!-- HMAC Note -->
+            <div
+              plunc-if="digestAlgorithm == 'HMAC'"
+              class="p-3.5 rounded-lg bg-blue-50 dark-mode:bg-blue-950/40 border border-blue-200 dark-mode:border-blue-900/60 flex items-start gap-3"
+            >
+              <svg
+                class="w-5 h-5 text-blue-600 dark-mode:text-blue-400 shrink-0 mt-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              <div
+                class="text-xs text-blue-900 dark-mode:text-blue-200 leading-relaxed"
+              >
+                <strong>HMAC-SHA256:</strong> Keyed-hash Message Authentication
+                Code. The secret key is used as the cryptographic key, and the
+                data string is hashed via HMAC. Product ID is only included when
+                reviewer type is <code>verified_buyer</code>.
+              </div>
+            </div>
+
+            <!-- SHA256 Note -->
+            <div
+              plunc-if="digestAlgorithm == 'SHA256'"
+              class="p-3.5 rounded-lg bg-purple-50 dark-mode:bg-purple-950/40 border border-purple-200 dark-mode:border-purple-900/60 flex items-start gap-3"
+            >
+              <svg
+                class="w-5 h-5 text-purple-600 dark-mode:text-purple-400 shrink-0 mt-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              <div
+                class="text-xs text-purple-900 dark-mode:text-purple-200 leading-relaxed"
+              >
+                <strong>SHA256:</strong> Standard cryptographic hash function.
+                The secret key is appended directly to the end of the
+                concatenated message string before computing the SHA-256 digest.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <p plunc-if="signature !== ''" class="text-gray-600 mb-4">
-        Signature: {{ signature }}
-      </p>
-      <p plunc-if="signature === ''" class="text-gray-600 mb-4">
-        Please fill in the required fields and select a digest algorithm to
-        generate a signature.
-      </p>
     </template>
 
+    <!-- SubmissionMethod Component Template -->
     <template plunc-name="SubmissionMethod">
-      <h3>Submission Method</h3>
-      <p>Current submission method: {{method}}</p>
-      <p>Signature: {{signature}}</p>
-      <div class="flex items-center">
-        <button
-          plunc-click="handleSelectMethod('landing_page')"
-          plunc-style="getButtonStyle('landing_page')"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg"
+      <div class="tv-card p-6 md:p-8 space-y-8">
+        <!-- Header & Segmented Tabs Bar -->
+        <div
+          class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-200 dark-mode:border-slate-800"
         >
-          Landing Page
-        </button>
-        <button
-          plunc-click="handleSelectMethod('reviews_widget')"
-          plunc-style="getButtonStyle('reviews_widget')"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg"
-        >
-          Reviews Widget
-        </button>
-        <button
-          plunc-click="handleSelectMethod('api_endpoint')"
-          plunc-style="getButtonStyle('api_endpoint')"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg"
-        >
-          API Endpoint
-        </button>
-      </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <svg
+                class="w-5 h-5 text-indigo-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                />
+              </svg>
+              <h2 class="text-xl font-bold text-slate-900 dark-mode:text-white">
+                Submission Methods
+              </h2>
+            </div>
+            <p class="text-sm text-slate-500 dark-mode:text-slate-400 mt-1">
+              Select an implementation strategy to view code templates and
+              parameter specifications
+            </p>
+          </div>
 
-      <section plunc-if="method == 'landing_page'">
-        <h4>Creating verified reviews via a dedicated landing page</h4>
-        <p>
-          Using this implementation method, you can create a unique URL that can
-          be added to emails or pages on your site. The URL contains a
-          calculated signature that will direct reviewers to a Yotpo-hosted
-          landing page when clicked. Reviews submitted via this Yotpo-hosted
-          landing page will receive a Verified Buyer or Verified Reviewer badge
-          based on the URL parameters.
-        </p>
-        <pre>
-            https://landing-pages.yotpo.com/base/#/review?appkey={{appKey}}&sku={{productId}}&product_title=USBthingy&product_description=testing-this-thing&product_url=http:%2F%2Fgkshops.com%2FBigUSBthingy.html&display_%20name=Arthurl&email={{reviewerEmail}}&signature={{signature}}&time_stamp={{timestamp}}&reviewer_type={{reviewerType}}&review_title_required=true
-        </pre>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Parameter</th>
-              <th scope="col">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>appkey</td>
-              <td>Your Yotpo account API key</td>
-            </tr>
-            <tr>
-              <td>sku</td>
-              <td>The SKU (stock-keeping unit) of the product</td>
-            </tr>
-            <tr>
-              <td>product_title</td>
-              <td>The name of the product</td>
-            </tr>
-            <tr>
-              <td>product_description&nbsp;</td>
-              <td>The description of the product</td>
-            </tr>
-            <tr>
-              <td>product_url</td>
-              <td>The URL of the product on your store website</td>
-            </tr>
-            <tr>
-              <td>display_name</td>
-              <td>reviewer display name&nbsp;</td>
-            </tr>
-            <tr>
-              <td>email</td>
-              <td>The verified buyer or verified reviewer user email</td>
-            </tr>
-            <tr>
-              <td>signature</td>
-              <td>
-                The signature is the hexadecimal representation of a computed
-                Hash-based Message Authentication Code, using HMAC or SHA256 as
-                the cryptographic function.<br />The secret for the function is
-                the
-                <a
-                  href="/v1/docs/finding-your-yotpo-app-key-and-secret-key"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  data-a11y-ext-processed="true"
-                  >account secret<span
-                    class="sr-only"
-                    style="user-select: none"
-                  >
-                    (opens in new tab)</span
-                  ></a
-                >.<br />See
-                <a
-                  href="/v1/docs/implementing-trusted-vendors#signing-reviewer-data"
-                  translate="no"
-                  rel="noopener"
-                  >Signing Reviewer Data</a
-                >
-                to learn how to generate a data signature.
-              </td>
-            </tr>
-            <tr>
-              <td>time_stamp</td>
-              <td>Unix timestamp</td>
-            </tr>
-            <tr>
-              <td>reviewer_type</td>
-              <td>
-                The reviewer type. Use this field only if there is also a
-                Reviews Widget on the same page.<br />Possible values:<br /><strong
-                  >verified_buyer&nbsp;</strong
-                >or <strong>verified_reviewer</strong>
-              </td>
-            </tr>
-            <tr>
-              <td>review_title_required</td>
-              <td>
-                Accepts a Boolean as a parameter.<br />false: will not include a
-                review title field in the landing page<br />true: will include a
-                review title field in the landing page
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section plunc-if="method == 'reviews_widget'">
-        <h4>
-          Creating verified reviews through the Reviews Widget or Reviews Tab
-        </h4>
-        <p>
-          Using this implementation method, reviews created through the Reviews
-          Widget or the Reviews Tab will receive a Verified Buyer or Verified
-          Reviewer badge based on your configurations.
-        </p>
-        <p>
-          Add the div element below to the DOM structure of the relevant page.
-        </p>
-        <div class="bg-red-100 p-4 border border-red-400 text-red-700">
-          Please note: You'll need to substitute each data element with the
-          appropriate values of the buyer or reviewer. The div class must be
-          "yotpo-signed-data" The element should be added to the DOM structure
-          of the relevant page.
-        </div>
-        <code>
-          &lt;div class="yotpo-signed-data" data-user-name="my name"
-          data-user-email="{{reviewerEmail}}" data-signature="{{signature}}"
-          data-reviewer-type="{{reviewerType}}" data-time-stamp="{{timestamp}}"
-          &gt;&lt;/div&gt;
-        </code>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Parameter</th>
-              <th scope="col">Description&nbsp;</th>
-              <th scope="col">Required&nbsp;</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>data-user-name</td>
-              <td>The full name of the verified buyer/verified reviewer</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>data-user-email</td>
-              <td>The email address of the verified buyer/verified reviewer</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>data-reviewer-type</td>
-              <td>
-                The reviewer type.<br />Use this field only if there is also a
-                reviews widget on the same page.<br />Possible values:<br /><strong
-                  >verified_buyer</strong
-                >
-                or <strong>verified_reviewer</strong>
-              </td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>data-time-stamp</td>
-              <td>Unix timestamp</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>data-signature</td>
-              <td>
-                The signature is the hexadecimal representation of a computed
-                hash-based Message Authentication Code, using HMAC or SHA256 as
-                the cryptographic function.<br />The secret for the function is
-                the
-                <a
-                  href="/v1/docs/finding-your-yotpo-app-key-and-secret-key"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  data-a11y-ext-processed="true"
-                  >account secret<span
-                    class="sr-only"
-                    style="user-select: none"
-                  >
-                    (opens in new tab)</span
-                  ></a
-                >.<br />See
-                <a
-                  href="/v1/docs/implementing-trusted-vendors#signing-reviewer-data"
-                  rel="noopener"
-                  >Signing Reviewer Data</a
-                >
-                to learn how to generate a data signature.
-              </td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>data-reviewer-badge</td>
-              <td>
-                The custom badge name for this reviewer.<br />Note: &nbsp;Only
-                use this when using the Customized Badge feature
-              </td>
-              <td><br /></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section plunc-if="method == 'api_endpoint'">
-        <h4>Creating verified reviews by API endpoint</h4>
-        <p>
-          Using this implementation method, reviews created using the Create
-          Reviews (Asynchronous) endpoint will receive a Verified Buyer or
-          Verified Reviewer badge based on your configurations.
-        </p>
-        <p>
-          Please refer to the
-          <a href="https://apidocs.yotpo.com/reference/welcome#creating-reviews"
-            >Creating Reviews (Asynchronous) endpoint</a
+          <!-- Method Selector Buttons (uses plunc-style="getButtonStyle(...)") -->
+          <div
+            class="p-1.5 bg-slate-100 dark-mode:bg-slate-900/80 rounded-xl border border-slate-200 dark-mode:border-slate-800 flex items-center gap-1.5 flex-wrap sm:flex-nowrap"
           >
-          in the Yotpo API documentation to view a full list of endpoint
-          parameters, values, and responses.
-        </p>
-        <pre>
-            curl --location 'https://api.yotpo.com/v1/widget/reviews' \
+            <button
+              plunc-click="handleSelectMethod('landing_page')"
+              plunc-style="getButtonStyle('landing_page')"
+              class="method-tab-btn flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all"
+            >
+              <svg
+                class="w-4 h-4 mr-1.5 inline"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                />
+              </svg>
+              Landing Page
+            </button>
+
+            <button
+              plunc-click="handleSelectMethod('reviews_widget')"
+              plunc-style="getButtonStyle('reviews_widget')"
+              class="method-tab-btn flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all"
+            >
+              <svg
+                class="w-4 h-4 mr-1.5 inline"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                />
+              </svg>
+              Reviews Widget
+            </button>
+
+            <button
+              plunc-click="handleSelectMethod('api_endpoint')"
+              plunc-style="getButtonStyle('api_endpoint')"
+              class="method-tab-btn flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all"
+            >
+              <svg
+                class="w-4 h-4 mr-1.5 inline"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              API Endpoint
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- Tab 1: Dedicated Landing Page Method           -->
+        <!-- ============================================== -->
+        <section plunc-if="method == 'landing_page'" class="space-y-6">
+          <div class="space-y-2">
+            <h3
+              class="text-lg font-bold text-slate-900 dark-mode:text-white flex items-center gap-2"
+            >
+              <span
+                >Creating verified reviews via a dedicated landing page</span
+              >
+            </h3>
+            <p
+              class="text-sm text-slate-600 dark-mode:text-slate-300 leading-relaxed max-w-4xl"
+            >
+              Using this implementation method, you can generate a unique URL to
+              include in customer emails or pages on your site. The URL contains
+              your computed signature and parameters to direct reviewers to a
+              Yotpo-hosted landing page. Reviews submitted via this page receive
+              a Verified Buyer or Verified Reviewer badge automatically.
+            </p>
+          </div>
+
+          <!-- Code Snippet Box -->
+          <div
+            class="rounded-xl overflow-hidden border border-slate-700 bg-slate-900 shadow-xl"
+          >
+            <div
+              class="px-4 py-2.5 bg-slate-800/90 border-b border-slate-700/80 flex items-center justify-between"
+            >
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                <span class="ml-2 text-xs font-mono text-slate-400"
+                  >Generated Landing Page URL</span
+                >
+              </div>
+              <button
+                type="button"
+                onclick="copyElementText('landingPageUrl', this)"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
+              >
+                <svg
+                  class="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>Copy URL</span>
+              </button>
+            </div>
+            <pre
+              class="p-4 text-xs sm:text-sm font-mono text-emerald-400 break-all whitespace-pre-wrap leading-relaxed overflow-x-auto"
+            ><code id="landingPageUrl">https://landing-pages.yotpo.com/base/#/review?appkey={{appKey}}&sku={{productId}}&product_title=USBthingy&product_description=testing-this-thing&product_url=http:%2F%2Fgkshops.com%2FBigUSBthingy.html&display_name=Arthur&email={{reviewerEmail}}&signature={{signature}}&time_stamp={{timestamp}}&reviewer_type={{reviewerType}}&review_title_required=true</code></pre>
+          </div>
+
+          <!-- Parameter Reference Table -->
+          <div class="space-y-3">
+            <h4
+              class="text-sm font-bold uppercase tracking-wider text-slate-900 dark-mode:text-white"
+            >
+              URL Query Parameters
+            </h4>
+            <div
+              class="overflow-x-auto rounded-xl border border-slate-200 dark-mode:border-slate-800"
+            >
+              <table class="tv-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="w-48">Parameter</th>
+                    <th scope="col">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >appkey</code
+                      >
+                    </td>
+                    <td>Your Yotpo account API key.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >sku</code
+                      >
+                    </td>
+                    <td>The SKU (stock-keeping unit) of the product.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >product_title</code
+                      >
+                    </td>
+                    <td>The display name of the product.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >product_description</code
+                      >
+                    </td>
+                    <td>The description of the product.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >product_url</code
+                      >
+                    </td>
+                    <td>The URL of the product on your storefront.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >display_name</code
+                      >
+                    </td>
+                    <td>Reviewer display name.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >email</code
+                      >
+                    </td>
+                    <td>
+                      The verified buyer or verified reviewer email address.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >signature</code
+                      >
+                    </td>
+                    <td>
+                      The hexadecimal representation of the computed
+                      authentication code, using HMAC or SHA256. The secret is
+                      your Yotpo account secret.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >time_stamp</code
+                      >
+                    </td>
+                    <td>Unix epoch timestamp in milliseconds.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >reviewer_type</code
+                      >
+                    </td>
+                    <td>
+                      The reviewer badge type. Possible values:
+                      <code>verified_buyer</code> or
+                      <code>verified_reviewer</code>.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >review_title_required</code
+                      >
+                    </td>
+                    <td>
+                      Boolean parameter (<code>true</code> or
+                      <code>false</code>) declaring whether the review title
+                      field is mandatory on the landing page.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- Tab 2: Reviews Widget Method                   -->
+        <!-- ============================================== -->
+        <section plunc-if="method == 'reviews_widget'" class="space-y-6">
+          <div class="space-y-2">
+            <h3 class="text-lg font-bold text-slate-900 dark-mode:text-white">
+              Creating verified reviews through the Reviews Widget or Reviews
+              Tab
+            </h3>
+            <p
+              class="text-sm text-slate-600 dark-mode:text-slate-300 leading-relaxed max-w-4xl"
+            >
+              Using this method, reviews created via your on-site Reviews Widget
+              or Reviews Tab automatically receive a Verified Buyer or Verified
+              Reviewer badge based on the signed data element present in the
+              DOM.
+            </p>
+          </div>
+
+          <!-- Alert Callout -->
+          <div
+            class="p-4 rounded-xl bg-amber-50 dark-mode:bg-amber-950/40 border border-amber-200 dark-mode:border-amber-900/60 flex items-start gap-3"
+          >
+            <svg
+              class="w-5 h-5 text-amber-600 dark-mode:text-amber-400 shrink-0 mt-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <div
+              class="text-xs text-amber-900 dark-mode:text-amber-200 leading-relaxed"
+            >
+              <strong>Implementation Note:</strong> Substitute each data element
+              with the appropriate buyer or reviewer values. The element class
+              must strictly be <code>"yotpo-signed-data"</code> and must be
+              embedded directly in the page DOM alongside the widget.
+            </div>
+          </div>
+
+          <!-- Code Snippet Box -->
+          <div
+            class="rounded-xl overflow-hidden border border-slate-700 bg-slate-900 shadow-xl"
+          >
+            <div
+              class="px-4 py-2.5 bg-slate-800/90 border-b border-slate-700/80 flex items-center justify-between"
+            >
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                <span class="ml-2 text-xs font-mono text-slate-400"
+                  >HTML DOM Element</span
+                >
+              </div>
+              <button
+                type="button"
+                onclick="copyElementText('widgetSnippet', this)"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
+              >
+                <svg
+                  class="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>Copy HTML</span>
+              </button>
+            </div>
+            <pre
+              class="p-4 text-xs sm:text-sm font-mono text-sky-300 break-all whitespace-pre-wrap leading-relaxed overflow-x-auto"
+            ><code id="widgetSnippet">&lt;div class="yotpo-signed-data"
+     data-user-name="John Doe"
+     data-user-email="{{reviewerEmail}}"
+     data-signature="{{signature}}"
+     data-reviewer-type="{{reviewerType}}"
+     data-time-stamp="{{timestamp}}"&gt;&lt;/div&gt;</code></pre>
+          </div>
+
+          <!-- Parameter Reference Table -->
+          <div class="space-y-3">
+            <h4
+              class="text-sm font-bold uppercase tracking-wider text-slate-900 dark-mode:text-white"
+            >
+              DOM Data Attributes
+            </h4>
+            <div
+              class="overflow-x-auto rounded-xl border border-slate-200 dark-mode:border-slate-800"
+            >
+              <table class="tv-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="w-48">Attribute</th>
+                    <th scope="col">Description</th>
+                    <th scope="col" class="w-32 text-center">Required</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >data-user-name</code
+                      >
+                    </td>
+                    <td>The full name of the verified buyer / reviewer.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >data-user-email</code
+                      >
+                    </td>
+                    <td>The email address of the verified reviewer.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >data-reviewer-type</code
+                      >
+                    </td>
+                    <td>
+                      Reviewer badge type: <code>verified_buyer</code> or
+                      <code>verified_reviewer</code>.
+                    </td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >data-time-stamp</code
+                      >
+                    </td>
+                    <td>Unix timestamp in milliseconds.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >data-signature</code
+                      >
+                    </td>
+                    <td>
+                      Computed cryptographic signature hexadecimal digest.
+                    </td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >data-reviewer-badge</code
+                      >
+                    </td>
+                    <td>
+                      Custom badge name (only used with Customized Badge
+                      feature).
+                    </td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 dark-mode:bg-slate-800 dark-mode:text-slate-400"
+                        >Optional</span
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- Tab 3: API Endpoint Method                     -->
+        <!-- ============================================== -->
+        <section plunc-if="method == 'api_endpoint'" class="space-y-6">
+          <div class="space-y-2">
+            <h3 class="text-lg font-bold text-slate-900 dark-mode:text-white">
+              Creating verified reviews via API Endpoint
+            </h3>
+            <p
+              class="text-sm text-slate-600 dark-mode:text-slate-300 leading-relaxed max-w-4xl"
+            >
+              Using this method, reviews created programmatically using the
+              <strong>Creating Reviews (Asynchronous)</strong> endpoint will
+              receive a Verified Buyer or Verified Reviewer badge based on the
+              provided signature payload.
+            </p>
+          </div>
+
+          <!-- Code Snippet Box -->
+          <div
+            class="rounded-xl overflow-hidden border border-slate-700 bg-slate-900 shadow-xl"
+          >
+            <div
+              class="px-4 py-2.5 bg-slate-800/90 border-b border-slate-700/80 flex items-center justify-between"
+            >
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                <span class="ml-2 text-xs font-mono text-slate-400"
+                  >cURL Command</span
+                >
+              </div>
+              <button
+                type="button"
+                onclick="copyElementText('curlSnippet', this)"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors"
+              >
+                <svg
+                  class="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>Copy cURL</span>
+              </button>
+            </div>
+            <pre
+              class="p-4 text-xs sm:text-sm font-mono text-slate-200 whitespace-pre-wrap leading-relaxed overflow-x-auto"
+            ><code id="curlSnippet">curl --location 'https://api.yotpo.com/v1/widget/reviews' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "appkey": "{{appkey}}",
+    "appkey": "{{appKey}}",
     "domain": "http://www.shop.com",
-    "sku": "10",
+    "sku": "{{productId}}",
     "product_title": "Phone",
     "product_description": "Smart Phone",
     "product_url": "http://www.shop.com/phone.html",
@@ -422,167 +1756,402 @@
     "review_title": "Great Phone",
     "review_score": 5,
     "signature": "{{signature}}",
-    "time_stamp": "{{timeStamp}}",
+    "time_stamp": "{{timestamp}}",
     "reviewer_type": "{{reviewerType}}"
-}'
-        </pre>
+}'</code></pre>
+          </div>
 
-        <div class="bg-red-100 p-4 border border-red-400 text-red-700">
-          Please note: When creating Trusted Vendors reviews using this method,
-          the following parameters must be included:
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Parameter</th>
-              <th scope="col">Description</th>
-              <th scope="col">Required for Trusted Vendors</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>appkey</td>
-              <td>Your Yotpo account API key.</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>domain</td>
-              <td>The account domain.</td>
-              <td><br /></td>
-            </tr>
-            <tr>
-              <td>sku</td>
-              <td>
-                The unique ID of the product on your site (doesn't have to be
-                the SKU). To create a site review, use the value:
-                'yotpo_site_reviews'
-              </td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>product_title&nbsp;</td>
-              <td>The title of the product.</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>product_description</td>
-              <td>The description of the product</td>
-              <td><br /></td>
-            </tr>
-            <tr>
-              <td>product_url</td>
-              <td>The product page URL of the product</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>product_image_url</td>
-              <td>The URL of the product image</td>
-              <td><br /></td>
-            </tr>
-            <tr>
-              <td>display_name</td>
-              <td>The reviewer's name</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>email</td>
-              <td>The reviewer's email address</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>review_content&nbsp;</td>
-              <td>The text content of the review</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>image_urls</td>
-              <td>
-                The images submitted with the review.<br />Please note: Videos
-                cannot be uploaded via API.
-              </td>
-              <td><br /></td>
-            </tr>
-            <tr>
-              <td>review_title</td>
-              <td>The title of the review</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>review_score</td>
-              <td>The review score</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>signature</td>
-              <td>
-                The signature is the hexadecimal representation of a computed
-                Hash-based Message Authentication Code, using SHA256 as the
-                cryptographic function (HMAC-SHA256). Must be passed in
-                lowercase characters.<br />The secret for the function is the
-                <a
-                  href="/v1/docs/finding-your-yotpo-app-key-and-secret-key"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  data-a11y-ext-processed="true"
-                  >account secret<span
-                    class="sr-only"
-                    style="user-select: none"
-                  >
-                    (opens in new tab)</span
-                  ></a
-                >
-                key.<br />Note: The 'time_stamp' and 'reviewer_type' parameters
-                are mandatory when using the signature parameter.<br />See
-                <a
-                  href="/v1/docs/implementing-trusted-vendors#signing-reviewer-data"
-                  rel="noopener"
-                  >Signing Reviewer Data</a
-                >
-                to learn how to generate a data signature.
-              </td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>time_stamp</td>
-              <td>Unix timestamp</td>
-              <td>√</td>
-            </tr>
-            <tr>
-              <td>submission_time_stamp</td>
-              <td>
-                The date the review was created (if not today). Can be up to 7
-                days in the past. If you want to add a creation date that is
-                more than 7 days in the past, please
-                <a
-                  href="https://reviews.yotpo.com/#/?modal=contact_support"
-                  target="_blank"
-                  rel="noopener"
-                  data-a11y-ext-processed="true"
-                  >contact support<span
-                    class="sr-only"
-                    style="user-select: none"
-                  >
-                    (opens in new tab)</span
-                  ></a
-                >
-              </td>
-              <td><br /></td>
-            </tr>
-            <tr>
-              <td>reviewer_type</td>
-              <td>
-                The reviewer badge type.<br />Possible values:<br /><strong
-                  >verified_buyer</strong
-                >
-                or <strong>verified_reviewer</strong><br />Note: This is
-                relevant when creating reviews as a Trusted Vendor (signature is
-                mandatory)
-              </td>
-              <td>√</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+          <!-- Parameter Reference Table -->
+          <div class="space-y-3">
+            <h4
+              class="text-sm font-bold uppercase tracking-wider text-slate-900 dark-mode:text-white"
+            >
+              API Body Parameters
+            </h4>
+            <div
+              class="overflow-x-auto rounded-xl border border-slate-200 dark-mode:border-slate-800"
+            >
+              <table class="tv-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="w-48">Parameter</th>
+                    <th scope="col">Description</th>
+                    <th scope="col" class="w-32 text-center">Required</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >appkey</code
+                      >
+                    </td>
+                    <td>Your Yotpo account API key.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >sku</code
+                      >
+                    </td>
+                    <td>
+                      The unique ID of the product (or
+                      <code>'yotpo_site_reviews'</code> for site review).
+                    </td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >product_title</code
+                      >
+                    </td>
+                    <td>The title of the product.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >product_url</code
+                      >
+                    </td>
+                    <td>The product page URL.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >display_name</code
+                      >
+                    </td>
+                    <td>The reviewer's name.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >email</code
+                      >
+                    </td>
+                    <td>The reviewer's email address.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >review_content</code
+                      >
+                    </td>
+                    <td>The text content of the review.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >review_title</code
+                      >
+                    </td>
+                    <td>The title of the review.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >review_score</code
+                      >
+                    </td>
+                    <td>The numeric review score (e.g. 1-5).</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >signature</code
+                      >
+                    </td>
+                    <td>
+                      Hexadecimal HMAC or SHA256 cryptographic signature. Must
+                      be in lowercase characters.
+                    </td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >time_stamp</code
+                      >
+                    </td>
+                    <td>Unix timestamp in milliseconds.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >reviewer_type</code
+                      >
+                    </td>
+                    <td>
+                      Reviewer badge: <code>verified_buyer</code> or
+                      <code>verified_reviewer</code>.
+                    </td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 dark-mode:bg-emerald-950 dark-mode:text-emerald-300"
+                        >Required</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >domain</code
+                      >
+                    </td>
+                    <td>The account domain.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 dark-mode:bg-slate-800 dark-mode:text-slate-400"
+                        >Optional</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >product_description</code
+                      >
+                    </td>
+                    <td>The description of the product.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 dark-mode:bg-slate-800 dark-mode:text-slate-400"
+                        >Optional</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >product_image_url</code
+                      >
+                    </td>
+                    <td>The URL of the product image.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 dark-mode:bg-slate-800 dark-mode:text-slate-400"
+                        >Optional</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >image_urls</code
+                      >
+                    </td>
+                    <td>Images submitted with the review.</td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 dark-mode:bg-slate-800 dark-mode:text-slate-400"
+                        >Optional</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code
+                        class="font-mono text-xs font-semibold text-indigo-600 dark-mode:text-indigo-400"
+                        >submission_time_stamp</code
+                      >
+                    </td>
+                    <td>
+                      Creation date if not today (up to 7 days in the past).
+                    </td>
+                    <td class="text-center">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 dark-mode:bg-slate-800 dark-mode:text-slate-400"
+                        >Optional</span
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
     </template>
+
+    <!-- Global Toast Notification Container -->
+    <div
+      id="toastNotification"
+      class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 text-white dark-mode:bg-white dark-mode:text-slate-900 shadow-2xl text-xs font-semibold transition-all duration-300 transform translate-y-12 opacity-0 pointer-events-none"
+    >
+      <svg
+        class="w-4 h-4 text-emerald-400 dark-mode:text-emerald-600 shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      <span id="toastMessage">Copied!</span>
+    </div>
+
+    <!-- UI Helper Scripts -->
+    <script>
+      // Secret Key Visibility Toggle
+      function toggleSecretVisibility() {
+        const input = document.getElementById("secretKeyInput");
+        const text = document.getElementById("secret-visibility-text");
+        if (!input) return;
+        if (input.type === "password") {
+          input.type = "text";
+          if (text) text.textContent = "Hide Secret";
+        } else {
+          input.type = "password";
+          if (text) text.textContent = "Show Secret";
+        }
+      }
+
+      // Copy signature value
+      function copySignatureValue(btn) {
+        const el = document.getElementById("signatureText");
+        if (el && el.textContent.trim()) {
+          navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+            showToast("Signature copied to clipboard!");
+          });
+        }
+      }
+
+      // Copy element text content
+      function copyElementText(id, btn) {
+        const el = document.getElementById(id);
+        if (el) {
+          const text = el.innerText || el.textContent;
+          navigator.clipboard.writeText(text.trim()).then(() => {
+            showToast("Copied to clipboard!");
+            if (btn) {
+              const orig = btn.innerHTML;
+              btn.innerHTML = `<span class="text-emerald-400">Copied!</span>`;
+              setTimeout(() => {
+                btn.innerHTML = orig;
+              }, 1800);
+            }
+          });
+        }
+      }
+
+      // Toast notification helper
+      function showToast(msg) {
+        const toast = document.getElementById("toastNotification");
+        const text = document.getElementById("toastMessage");
+        if (!toast || !text) return;
+        text.textContent = msg;
+        toast.classList.remove("translate-y-12", "opacity-0");
+        toast.classList.add("translate-y-0", "opacity-100");
+        setTimeout(() => {
+          toast.classList.remove("translate-y-0", "opacity-100");
+          toast.classList.add("translate-y-12", "opacity-0");
+        }, 2400);
+      }
+
+      // Demo Data Filler for Immediate Testing
+      function fillDemoData() {
+        const demoValues = {
+          appKey: "yotpo_app_demo_772184",
+          secretKey: "sec_key_xyz9814523a1",
+          reviewerEmail: "elena.rostova@example.com",
+          productId: "PROD-SKU-8820",
+        };
+
+        for (const [key, value] of Object.entries(demoValues)) {
+          const input = document.querySelector(`[plunc-model="${key}"]`);
+          if (input) {
+            input.value = value;
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        }
+        showToast("Demo data populated and signature generated!");
+      }
+    </script>
   </body>
 </html>

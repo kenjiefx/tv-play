@@ -89,6 +89,11 @@ import {
       $scope.timestamp = Date.now();
       $scope.reviewerType = "verified_buyer";
       $scope.digestAlgorithm = "HMAC";
+      $scope.appKey = "";
+      $scope.secretKey = "";
+      $scope.reviewerEmail = "";
+      $scope.productId = "";
+      $scope.signature = "";
       $app.ready(() => {
         const isDarkMode = localStorage.getItem("isDarkMode") === "true";
         $scope.isDarkMode = isDarkMode;
@@ -170,6 +175,7 @@ import {
   app.component(
     "SignatureViewer",
     ($scope: SignatureViewerScope, $patch: PatchAPI) => {
+      $scope.signature = "";
       $scope.copyMessage = () => {
         const secretKeySection =
           $scope.digestAlgorithm === "SHA256" ? $scope.secretKey : "";
@@ -199,6 +205,14 @@ import {
     "SubmissionMethod",
     ($scope: SubmissionMethodScope, $patch: PatchAPI, $app: AppAPI) => {
       $scope.method = "landing_page"; // default value for submission method
+      $scope.signature = "";
+      $scope.appKey = "";
+      $scope.secretKey = "";
+      $scope.reviewerEmail = "";
+      $scope.productId = "";
+      $scope.reviewerType = "verified_buyer";
+      $scope.digestAlgorithm = "HMAC";
+      $scope.timestamp = Date.now();
       $scope.handleSelectMethod = (method: SubmissionMethodType) => {
         console.log("Selected submission method:", method);
         $scope.method = method;
